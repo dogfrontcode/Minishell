@@ -20,16 +20,4 @@ int ft_toupper(int c)
 	}
 	return c;
 }
-/*int main() {
-    // Array de caracteres
-    char input[] = {'A', 'A', '	', '!', 'e', 'E', '\0'};  // O '\0' é o terminador da string
 
-    // Converte cada caractere do array para maiúscula
-    for (int i = 0; input[i] != '\0'; i++) {
-        input[i] = (char)ft_toupper((int)input[i]);
-    }
-
-    printf("A string em maiúsculas é: %s\n", input);
-
-    return 0;
-}*/

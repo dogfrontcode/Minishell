@@ -11,84 +11,114 @@ static int	is_empty_line(char *str)
 	return (1);
 }
 
+static void	print_tokens(Token *tokens, int token_count)
+{
+	const char	*type_names[] = {"WORD", "PIPE", "REDIR_IN", 
+		"REDIR_OUT", "HEREDOC", "APPEND"};
+	int			i;
 
+	printf("Tokens encontrados (%d):\n", token_count);
+	i = 0;
+	while (i < token_count)
+	{
+		printf("  [%d] %s: \"%s\"\n", i, type_names[tokens[i].type], 
+			tokens[i].value);
+		i++;
+	}
+}
+
+static void	print_command_args(Command *cmd, int cmd_index)
+{
+	int	j;
+
+	printf("  Comando [%d]: ", cmd_index);
+	j = 0;
+	while (j < cmd->arg_count)
+	{
+		printf("'%s' ", cmd->args[j]);
+		j++;
+	}
+}
+
+static void	print_command_redirs(Command *cmd)
+{
+	const char	*redir_names[] = {"IN", "OUT", "APPEND_IN", 
+		"APPEND_OUT", "HEREDOC"};
+	int			j;
+
+	if (cmd->redir_count > 0)
+	{
+		printf("| Redirs: ");
+		j = 0;
+		while (j < cmd->redir_count)
+		{
+			printf("(%s -> %s) ", redir_names[cmd->redirs[j].type], 
+				cmd->redirs[j].filename);
+			j++;
+		}
+	}
+}
+
+static void	print_commands(Command *commands, int cmd_count)
+{
+	int	i;
+
+	printf("\n📋 COMANDOS PARSEADOS (%d):\n", cmd_count);
+	i = 0;
+	while (i < cmd_count)
+	{
+		print_command_args(&commands[i], i);
+		print_command_redirs(&commands[i]);
+		printf("\n");
+		i++;
+	}
+}
+
+static int	execute_commands(Command *commands, int cmd_count)
+{
+	int	exit_status;
+
+	printf("\n⚡ EXECUÇÃO:\n");
+	if (commands[0].redir_count > 0)
+	{
+		printf("🚧 Redirecionamentos ainda não implementados\n");
+		return (0);
+	}
+	exit_status = execute_pipeline(commands, cmd_count);
+	if (exit_status != 0 && cmd_count > 1)
+		printf("Pipeline executado com status: %d\n", exit_status);
+	return (exit_status);
+}
 
 void	handle_prompt(char *input)
 {
-	Token *tokens;
-	Command *commands;
-	int token_count = 0;
-	int cmd_count = 0;
-	int i, j;
+	Token		*tokens;
+	Command		*commands;
+	int			token_count;
+	int			cmd_count;
 
+	token_count = 0;
+	cmd_count = 0;
 	if (is_empty_line(input))
-		return;
-
+		return ;
 	printf("\n🔍 ANÁLISE LÉXICA:\n");
 	printf("Input: \"%s\"\n", input);
-
-	// Fase 1: Lexer
 	tokens = lexer(input, &token_count);
 	if (!tokens)
 	{
 		printf("❌ Erro no lexer!\n");
-		return;
+		return ;
 	}
-
-	printf("Tokens encontrados (%d):\n", token_count);
-	for (i = 0; i < token_count; i++)
-	{
-		const char *type_names[] = {"WORD", "PIPE", "REDIR_IN", "REDIR_OUT", "HEREDOC", "APPEND"};
-		printf("  [%d] %s: \"%s\"\n", i, type_names[tokens[i].type], tokens[i].value);
-	}
-
-	// Fase 2: Parser
+	print_tokens(tokens, token_count);
 	commands = parser(tokens, token_count, &cmd_count);
 	if (!commands)
 	{
 		printf("❌ Erro no parser!\n");
 		free_tokens(tokens, token_count);
-		return;
+		return ;
 	}
-
-	printf("\n📋 COMANDOS PARSEADOS (%d):\n", cmd_count);
-	for (i = 0; i < cmd_count; i++)
-	{
-		printf("  Comando [%d]: ", i);
-		for (j = 0; j < commands[i].arg_count; j++)
-		{
-			printf("'%s' ", commands[i].args[j]);
-		}
-		if (commands[i].redir_count > 0)
-		{
-			printf("| Redirs: ");
-			for (j = 0; j < commands[i].redir_count; j++)
-			{
-				const char *redir_names[] = {"IN", "OUT", "APPEND_IN", "APPEND_OUT", "HEREDOC"};
-				printf("(%s -> %s) ", redir_names[commands[i].redirs[j].type], 
-					commands[i].redirs[j].filename);
-			}
-		}
-		printf("\n");
-	}
-
-	// Fase 3: Execução
-	printf("\n⚡ EXECUÇÃO:\n");
-	if (commands[0].redir_count > 0)
-	{
-		printf("🚧 Redirecionamentos ainda não implementados\n");
-	}
-	else
-	{
-		// Executa pipeline (comando único ou múltiplos comandos)
-		int exit_status = execute_pipeline(commands, cmd_count);
-		if (exit_status != 0 && cmd_count > 1)
-		{
-			printf("Pipeline executado com status: %d\n", exit_status);
-		}
-	}
-
-	// Libera memória
+	print_commands(commands, cmd_count);
+	execute_commands(commands, cmd_count);
 	free_tokens(tokens, token_count);
 	free_commands(commands, cmd_count);
 	printf("─────────────────────────────\n");
