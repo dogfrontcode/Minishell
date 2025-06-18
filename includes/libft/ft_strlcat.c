@@ -31,12 +31,3 @@ size_t ft_strlcat(char *dst, const char *src, size_t dstsize) {
 
     return dst_len + src_len;
 }
-
-int main(void)
-{
-	char dest[50] = "hello";
-	char src[] = "42!";
-
-	ft_strlcat(dest,src,sizeof(dest));
-	printf("%s",dest);
-}
