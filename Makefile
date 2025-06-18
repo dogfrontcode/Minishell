@@ -7,6 +7,10 @@ RM			= rm -f
 # Diretórios
 SRC_DIR		= src
 INC_DIR		= includes
+LIBFT_DIR	= $(INC_DIR)/libft
+
+# Biblioteca libft
+LIBFT		= $(LIBFT_DIR)/libft.a
 
 # Fontes e objetos
 SRCS		= \
@@ -21,19 +25,24 @@ OBJS		= $(SRCS:.c=.o)
 INCLUDES	= -I$(INC_DIR)
 
 # Regras
-all: $(NAME)
+all: $(LIBFT) $(NAME)
 
-$(NAME): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -lreadline -o $(NAME)
+$(LIBFT):
+	$(MAKE) -C $(LIBFT_DIR)
+
+$(NAME): $(OBJS) $(LIBFT)
+	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) -lreadline -o $(NAME)
 
 %.o: %.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 clean:
 	$(RM) $(OBJS)
+	$(MAKE) -C $(LIBFT_DIR) clean
 
 fclean: clean
 	$(RM) $(NAME)
+	$(MAKE) -C $(LIBFT_DIR) fclean
 
 re: fclean all
 

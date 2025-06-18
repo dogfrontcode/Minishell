@@ -1,0 +1,16 @@
+# Arquivos de compilação
+*.o
+*.a
+
+# Executável do minishell
+minishell
+
+# Arquivos temporários do sistema
+.DS_Store
+*~
+*.swp
+*.swo
+.vscode/
+
+# Arquivos de debug
+*.dSYM/ 

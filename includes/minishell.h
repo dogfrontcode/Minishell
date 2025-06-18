@@ -9,6 +9,7 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <errno.h>
+# include "libft/libft.h"
 
 // Máximo permitido: 1 variável global (externa)
 extern volatile sig_atomic_t	g_signal;
