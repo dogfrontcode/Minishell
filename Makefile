@@ -18,9 +18,10 @@ SRCS		= \
 			$(SRC_DIR)/prompt/input.c \
 			$(SRC_DIR)/signals/signal_handler.c \
 			$(SRC_DIR)/parser/tokenizer.c \
-			$(SRC_DIR)/parser/parser.c \
-			$(SRC_DIR)/executor/pipeline.c \
-			# $(SRC_DIR)/utils/memory.c
+				$(SRC_DIR)/parser/parser.c \
+				$(SRC_DIR)/executor/pipeline.c \
+				$(SRC_DIR)/executor/redirections.c \
+# $(SRC_DIR)/utils/memory.c
 
 OBJS		= $(SRCS:.c=.o)
 

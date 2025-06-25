@@ -70,6 +70,7 @@ int execute_pipeline(Command *commands, int cmd_count);
 int execute_single_command(Command *cmd);
 int execute_builtin(Command *cmd);
 int is_builtin(char *cmd_name);
+int setup_redirections(Command *cmd);
 
 // Funções de sinais
 void	init_signals(void);

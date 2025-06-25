@@ -79,12 +79,7 @@ static int	execute_commands(Command *commands, int cmd_count)
 	int	exit_status;
 
 	printf("\n⚡ EXECUÇÃO:\n");
-	if (commands[0].redir_count > 0)
-	{
-		printf("🚧 Redirecionamentos ainda não implementados\n");
-		return (0);
-	}
-	exit_status = execute_pipeline(commands, cmd_count);
+       exit_status = execute_pipeline(commands, cmd_count);
 	if (exit_status != 0 && cmd_count > 1)
 		printf("Pipeline executado com status: %d\n", exit_status);
 	return (exit_status);

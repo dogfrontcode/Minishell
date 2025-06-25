@@ -105,19 +105,29 @@ static char	*get_command_path(char *cmd_name)
 	return (path);
 }
 
-static int	execute_external(Command *cmd)
+
+int     execute_single_command(Command *cmd)
 {
 	pid_t	pid;
 	int		status;
 	char	*path;
 
-	path = get_command_path(cmd->args[0]);
-	if (!path)
+	if (!cmd->args || cmd->arg_count == 0)
 		return (1);
+	if (cmd->redir_count == 0 && is_builtin(cmd->args[0]))
+		return (execute_builtin(cmd));
 	pid = fork();
 	if (pid == 0)
 	{
 		restore_signals();
+		if (setup_redirections(cmd))
+			exit(1);
+		if (is_builtin(cmd->args[0]))
+		{
+			execute_builtin(cmd);
+			exit(0);
+		}
+		path = get_command_path(cmd->args[0]);
 		execve(path, cmd->args, environ);
 		perror("execve");
 		exit(127);
@@ -125,28 +135,13 @@ static int	execute_external(Command *cmd)
 	else if (pid > 0)
 	{
 		waitpid(pid, &status, 0);
-		if (path != cmd->args[0])
-			free(path);
-		if (WIFEXITED(status))
-			return (WEXITSTATUS(status));
-		return (1);
+		return (WIFEXITED(status) ? WEXITSTATUS(status) : 1);
 	}
 	else
 	{
 		perror("fork");
-		if (path != cmd->args[0])
-			free(path);
 		return (1);
 	}
-}
-
-int	execute_single_command(Command *cmd)
-{
-	if (!cmd->args || cmd->arg_count == 0)
-		return (1);
-	if (is_builtin(cmd->args[0]))
-		return (execute_builtin(cmd));
-	return (execute_external(cmd));
 }
 
 static int	**create_pipes(int cmd_count)
@@ -198,6 +193,8 @@ static void	execute_child_command(Command *cmd, int **pipes, int cmd_count, int 
 
 	restore_signals();
 	setup_child_pipes(pipes, cmd_count, i);
+	if (setup_redirections(cmd))
+		exit(1);
 	close_all_pipes(pipes, cmd_count);
 	if (is_builtin(cmd->args[0]))
 	{
