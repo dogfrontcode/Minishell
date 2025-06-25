@@ -8,7 +8,7 @@ int is_quote(char c)
 
 int is_metachar(char c)
 {
-	return (c == '|' || c == '<' || c == '>');
+        return (c == '|' || c == '<' || c == '>' || c == '&');
 }
 
 int is_whitespace(char c)
@@ -29,10 +29,12 @@ static TokenType get_token_type(const char *value)
 		return (REDIR_OUT);
 	else if (len == 2 && ft_strncmp(value, "<<", 2) == 0)
 		return (HEREDOC);
-	else if (len == 2 && ft_strncmp(value, ">>", 2) == 0)
-		return (APPEND);
-	else
-		return (WORD);
+        else if (len == 2 && ft_strncmp(value, ">>", 2) == 0)
+                return (APPEND);
+        else if (len == 1 && ft_strncmp(value, "&", 1) == 0)
+                return (AMPERSAND);
+        else
+                return (WORD);
 }
 
 // Função para processar aspas e retornar o conteúdo entre aspas

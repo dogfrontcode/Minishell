@@ -134,17 +134,23 @@ static int validate_syntax(Token *tokens, int token_count)
 			return (0);
 		}
 
-		// Verifica redirecionador seguido de pipe
-		if ((tokens[i].type == REDIR_IN || tokens[i].type == REDIR_OUT ||
-			 tokens[i].type == APPEND || tokens[i].type == HEREDOC) &&
-			i + 1 < token_count && tokens[i + 1].type == PIPE)
-		{
-			printf("minishell: syntax error near unexpected token `|'\n");
-			return (0);
-		}
+                // Verifica redirecionador seguido de pipe
+                if ((tokens[i].type == REDIR_IN || tokens[i].type == REDIR_OUT ||
+                         tokens[i].type == APPEND || tokens[i].type == HEREDOC) &&
+                        i + 1 < token_count && tokens[i + 1].type == PIPE)
+                {
+                        printf("minishell: syntax error near unexpected token `|'\n");
+                        return (0);
+                }
 
-		i++;
-	}
+                if (tokens[i].type == AMPERSAND && i != token_count - 1)
+                {
+                        printf("minishell: '&' deve ser o \xC3\xBAltimo token\n");
+                        return (0);
+                }
+
+                i++;
+        }
 
 	// Verifica se o último grupo tem comando
 	if (!has_command_in_group && token_count > 0)
@@ -174,10 +180,11 @@ static int count_commands(Token *tokens, int token_count)
 // Função para inicializar um comando
 static void init_command(Command *cmd)
 {
-	cmd->args = NULL;
-	cmd->arg_count = 0;
-	cmd->redirs = NULL;
-	cmd->redir_count = 0;
+        cmd->args = NULL;
+        cmd->arg_count = 0;
+        cmd->redirs = NULL;
+        cmd->redir_count = 0;
+        cmd->background = 0;
 }
 
 // Função para adicionar argumento a um comando
@@ -229,9 +236,9 @@ static int process_command_tokens(Command *cmd, Token *tokens, int start, int en
 			if (!add_argument(cmd, tokens[i].value))
 				return (0);
 		}
-		else if (tokens[i].type == REDIR_IN || tokens[i].type == REDIR_OUT ||
-				 tokens[i].type == APPEND || tokens[i].type == HEREDOC)
-		{
+                else if (tokens[i].type == REDIR_IN || tokens[i].type == REDIR_OUT ||
+                                 tokens[i].type == APPEND || tokens[i].type == HEREDOC)
+                {
 			// O próximo token deve ser o filename
 			if (i + 1 < end && tokens[i + 1].type == WORD)
 			{
@@ -245,9 +252,11 @@ static int process_command_tokens(Command *cmd, Token *tokens, int start, int en
 				// Erro de sintaxe - já foi validado antes
 				return (0);
 			}
-		}
-		i++;
-	}
+                }
+                else if (tokens[i].type == AMPERSAND && i == end - 1)
+                        cmd->background = 1;
+                i++;
+        }
 	return (1);
 }
 

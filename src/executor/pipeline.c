@@ -15,9 +15,17 @@ int	is_builtin(char *cmd_name)
 		return (1);
 	if (ft_strncmp(cmd_name, "exit", 4) == 0 && ft_strlen(cmd_name) == 4)
 		return (1);
-	if (ft_strncmp(cmd_name, "cd", 2) == 0 && ft_strlen(cmd_name) == 2)
-		return (1);
-	return (0);
+        if (ft_strncmp(cmd_name, "cd", 2) == 0 && ft_strlen(cmd_name) == 2)
+                return (1);
+        if (ft_strncmp(cmd_name, "history", 7) == 0 && ft_strlen(cmd_name) == 7)
+                return (1);
+        if (ft_strncmp(cmd_name, "jobs", 4) == 0 && ft_strlen(cmd_name) == 4)
+                return (1);
+        if (ft_strncmp(cmd_name, "fg", 2) == 0 && ft_strlen(cmd_name) == 2)
+                return (1);
+        if (ft_strncmp(cmd_name, "bg", 2) == 0 && ft_strlen(cmd_name) == 2)
+                return (1);
+        return (0);
 }
 
 static void	execute_echo(char **args, int arg_count)
@@ -87,11 +95,31 @@ int	execute_builtin(Command *cmd)
 	else if (ft_strncmp(cmd->args[0], "env", 3) == 0 
 		&& ft_strlen(cmd->args[0]) == 3)
 		execute_env();
-	else if (ft_strncmp(cmd->args[0], "exit", 4) == 0 
-		&& ft_strlen(cmd->args[0]) == 4)
-		exit(0);
-	else
-		return (1);
+        else if (ft_strncmp(cmd->args[0], "exit", 4) == 0
+                && ft_strlen(cmd->args[0]) == 4)
+                exit(0);
+        else if (ft_strncmp(cmd->args[0], "history", 7) == 0
+                && ft_strlen(cmd->args[0]) == 7)
+        {
+                HIST_ENTRY **h = history_list();
+                int i = 0;
+                while (h && h[i])
+                {
+                        printf("%d %s\n", i + history_base, h[i]->line);
+                        i++;
+                }
+        }
+        else if (ft_strncmp(cmd->args[0], "jobs", 4) == 0
+                && ft_strlen(cmd->args[0]) == 4)
+                print_jobs();
+        else if (ft_strncmp(cmd->args[0], "fg", 2) == 0
+                && ft_strlen(cmd->args[0]) == 2 && cmd->arg_count > 1)
+                bring_job_foreground(atoi(cmd->args[1]));
+        else if (ft_strncmp(cmd->args[0], "bg", 2) == 0
+                && ft_strlen(cmd->args[0]) == 2 && cmd->arg_count > 1)
+                continue_job_background(atoi(cmd->args[1]));
+        else
+                return (1);
 	return (0);
 }
 

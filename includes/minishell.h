@@ -20,12 +20,13 @@ extern int	g_last_exit_status;
 
 // Estruturas para Lexer e Parser
 typedef enum {
-	WORD,
-	PIPE,
-	REDIR_IN,
-	REDIR_OUT,
-	HEREDOC,
-	APPEND
+        WORD,
+        PIPE,
+        REDIR_IN,
+        REDIR_OUT,
+        HEREDOC,
+        APPEND,
+        AMPERSAND
 } TokenType;
 
 typedef struct {
@@ -47,10 +48,11 @@ typedef struct {
 } Redirect;
 
 typedef struct {
-	char **args;
-	int arg_count;
-	Redirect *redirs;
-	int redir_count;
+        char **args;
+        int arg_count;
+        Redirect *redirs;
+        int redir_count;
+        int background;
 } Command;
 
 // Funções do Lexer
@@ -72,6 +74,16 @@ int execute_single_command(Command *cmd);
 int execute_builtin(Command *cmd);
 int is_builtin(char *cmd_name);
 int setup_redirections(Command *cmd);
+
+// Wildcards
+void    expand_wildcards(Command *commands, int cmd_count);
+
+// Job control
+void    add_job(pid_t pid, char *cmdline);
+void    check_jobs(void);
+void    print_jobs(void);
+void    bring_job_foreground(int id);
+void    continue_job_background(int id);
 
 // Funções de sinais
 void	init_signals(void);

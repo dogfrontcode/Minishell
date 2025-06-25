@@ -89,26 +89,38 @@ static void	print_welcome_message(void)
 	printf("   • ctrl-\\: Não faz nada (como no Bash)\n\n");
 }
 
-static int	handle_input(char *input)
+static int handle_input(char *input)
 {
-	if (!input)
-	{
-		printf("exit\n");
-		return (1);
-	}
-	if (g_signal == SIGINT)
-	{
-		free(input);
-		return (0);
-	}
-       if (*input)
-       {
-               add_history(input);
-               handle_prompt(input);
-               printf("Exit status: %d\n", g_last_exit_status);
-       }
-	free(input);
-	return (0);
+        char *cmd = input;
+        if (!input)
+        {
+                printf("exit\n");
+                return (1);
+        }
+        if (g_signal == SIGINT)
+        {
+                free(input);
+                return (0);
+        }
+        if (*input)
+        {
+                if (strcmp(input, "!!") == 0)
+                {
+                        HIST_ENTRY **h = history_list();
+                        if (h && history_length > 0)
+                        {
+                                cmd = strdup(h[history_length - 1]->line);
+                                printf("%s\n", cmd);
+                        }
+                }
+                add_history(cmd);
+                handle_prompt(cmd);
+                if (cmd != input)
+                        free(cmd);
+                printf("Exit status: %d\n", g_last_exit_status);
+        }
+        free(input);
+        return (0);
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -123,9 +135,10 @@ int	main(int argc, char **argv, char **envp)
 	while (1)
 	{
 		g_signal = 0;
-		input = readline("minishell$ ");
-		if (handle_input(input))
-			break ;
-	}
+                input = readline("minishell$ ");
+                if (handle_input(input))
+                        break ;
+                check_jobs();
+        }
 	return (0);
 }

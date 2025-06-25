@@ -14,7 +14,7 @@ static int	is_empty_line(char *str)
 static void	print_tokens(Token *tokens, int token_count)
 {
 	const char	*type_names[] = {"WORD", "PIPE", "REDIR_IN", 
-		"REDIR_OUT", "HEREDOC", "APPEND"};
+"REDIR_OUT", "HEREDOC", "APPEND", "AMP"};
 	int			i;
 
 	printf("Tokens encontrados (%d):\n", token_count);
@@ -68,22 +68,42 @@ static void	print_commands(Command *commands, int cmd_count)
 	while (i < cmd_count)
 	{
 		print_command_args(&commands[i], i);
-		print_command_redirs(&commands[i]);
-		printf("\n");
-		i++;
-	}
+print_command_redirs(&commands[i]);
+printf("\n");
+i++;
+}
 }
 
-static int	execute_commands(Command *commands, int cmd_count)
+static int      execute_commands(Command *commands, int cmd_count)
 {
-	int	exit_status;
+        int     exit_status;
 
-	printf("\n⚡ EXECUÇÃO:\n");
-       exit_status = execute_pipeline(commands, cmd_count);
-	if (exit_status != 0 && cmd_count > 1)
-		printf("Pipeline executado com status: %d\n", exit_status);
-	return (exit_status);
+        printf("\n⚡ EXECUÇÃO:\n");
+        if (commands[cmd_count - 1].background)
+        {
+                pid_t pid = fork();
+                if (pid == 0)
+                {
+                        ignore_signals();
+                        execute_pipeline(commands, cmd_count);
+                        exit(g_last_exit_status);
+                }
+                else if (pid > 0)
+                        add_job(pid, commands[0].args[0]);
+                else
+                        perror("fork");
+                exit_status = 0;
+        }
+        else
+        {
+                exit_status = execute_pipeline(commands, cmd_count);
+                if (exit_status != 0 && cmd_count > 1)
+                        printf("Pipeline executado com status: %d\n", exit_status);
+        }
+        return (exit_status);
 }
+
+
 
 void	handle_prompt(char *input)
 {
@@ -112,10 +132,11 @@ void	handle_prompt(char *input)
 		free_tokens(tokens, token_count);
 		return ;
 	}
-	print_commands(commands, cmd_count);
-	execute_commands(commands, cmd_count);
-	free_tokens(tokens, token_count);
-	free_commands(commands, cmd_count);
+        expand_wildcards(commands, cmd_count);
+        print_commands(commands, cmd_count);
+        execute_commands(commands, cmd_count);
+        free_tokens(tokens, token_count);
+        free_commands(commands, cmd_count);
 	printf("─────────────────────────────\n");
 }
 
