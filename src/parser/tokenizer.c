@@ -49,12 +49,14 @@ static char *process_quotes(const char *input, int *i, char quote_char)
 		len++;
 	}
 
-	// TODO: Verificar se as aspas foram fechadas
-	if (input[*i] != quote_char)
-	{
-		// Erro: aspas não fechadas
-		return (NULL);
-	}
+        // Verifica se as aspas foram fechadas
+        if (input[*i] != quote_char)
+        {
+                ft_putstr_fd("minishell: unexpected EOF while looking for matching '", 2);
+                ft_putchar_fd(quote_char, 2);
+                ft_putendl_fd("'", 2);
+                return (NULL);
+        }
 
 	// Aloca memória e copia o conteúdo
 	result = malloc(sizeof(char) * (len + 1));
