@@ -1,6 +1,7 @@
 #include "../includes/minishell.h"
 
 volatile sig_atomic_t	g_signal = 0;
+int	g_last_exit_status = 0;
 
 static void	print_test_tokens(Token *tokens, int token_count)
 {
@@ -100,11 +101,12 @@ static int	handle_input(char *input)
 		free(input);
 		return (0);
 	}
-	if (*input)
-	{
-		add_history(input);
-		handle_prompt(input);
-	}
+       if (*input)
+       {
+               add_history(input);
+               handle_prompt(input);
+               printf("Exit status: %d\n", g_last_exit_status);
+       }
 	free(input);
 	return (0);
 }
