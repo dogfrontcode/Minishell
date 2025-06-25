@@ -16,6 +16,7 @@
 
 // Máximo permitido: 1 variável global (externa)
 extern volatile sig_atomic_t	g_signal;
+extern int	g_last_exit_status;
 
 // Estruturas para Lexer e Parser
 typedef enum {

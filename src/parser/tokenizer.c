@@ -49,12 +49,11 @@ static char *process_quotes(const char *input, int *i, char quote_char)
 		len++;
 	}
 
-	// TODO: Verificar se as aspas foram fechadas
-	if (input[*i] != quote_char)
-	{
-		// Erro: aspas não fechadas
-		return (NULL);
-	}
+       if (input[*i] != quote_char)
+       {
+               printf("minishell: syntax error: unclosed quote\n");
+               return (NULL);
+       }
 
 	// Aloca memória e copia o conteúdo
 	result = malloc(sizeof(char) * (len + 1));

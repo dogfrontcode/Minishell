@@ -1,6 +1,7 @@
 #include "../../includes/minishell.h"
 
 extern char **environ;
+extern int  g_last_exit_status;
 
 int	is_builtin(char *cmd_name)
 {
@@ -32,13 +33,16 @@ static void	execute_echo(char **args, int arg_count)
 		newline = 0;
 		i = 2;
 	}
-	while (i < arg_count)
-	{
-		printf("%s", args[i]);
-		if (i < arg_count - 1)
-			printf(" ");
-		i++;
-	}
+       while (i < arg_count)
+       {
+               if (ft_strncmp(args[i], "$?", 2) == 0 && ft_strlen(args[i]) == 2)
+                       printf("%d", g_last_exit_status);
+               else
+                       printf("%s", args[i]);
+               if (i < arg_count - 1)
+                       printf(" ");
+               i++;
+       }
 	if (newline)
 		printf("\n");
 }
@@ -91,18 +95,48 @@ int	execute_builtin(Command *cmd)
 	return (0);
 }
 
-static char	*get_command_path(char *cmd_name)
+static char     *get_command_path(char *cmd_name)
 {
-	char	*path;
+       char    *path_env;
+       char    **dirs;
+       char    *tmp;
+       char    *full;
+       int             i;
 
-	if (ft_strchr(cmd_name, '/'))
-		return (cmd_name);
-	path = malloc(ft_strlen(cmd_name) + 6);
-	if (!path)
-		return (NULL);
-	ft_strlcpy(path, "/bin/", 6);
-	ft_strlcat(path, cmd_name, ft_strlen(cmd_name) + 6);
-	return (path);
+       if (ft_strchr(cmd_name, '/'))
+               return (ft_strdup(cmd_name));
+       path_env = getenv("PATH");
+       if (!path_env)
+               return (ft_strdup(cmd_name));
+       dirs = ft_split(path_env, ':');
+       if (!dirs)
+               return (ft_strdup(cmd_name));
+       i = 0;
+       while (dirs[i])
+       {
+               tmp = ft_strjoin(dirs[i], "/");
+               if (!tmp)
+                       break ;
+               full = ft_strjoin(tmp, cmd_name);
+               free(tmp);
+               if (!full)
+                       break ;
+               if (access(full, X_OK) == 0)
+               {
+                       int j = 0;
+                       while (dirs[j])
+                               free(dirs[j++]);
+                       free(dirs);
+                       return (full);
+               }
+               free(full);
+               i++;
+       }
+       i = 0;
+       while (dirs[i])
+               free(dirs[i++]);
+       free(dirs);
+       return (ft_strdup(cmd_name));
 }
 
 
@@ -112,10 +146,13 @@ int     execute_single_command(Command *cmd)
 	int		status;
 	char	*path;
 
-	if (!cmd->args || cmd->arg_count == 0)
-		return (1);
-	if (cmd->redir_count == 0 && is_builtin(cmd->args[0]))
-		return (execute_builtin(cmd));
+       if (!cmd->args || cmd->arg_count == 0)
+               return (1);
+       if (cmd->redir_count == 0 && is_builtin(cmd->args[0]))
+       {
+               g_last_exit_status = execute_builtin(cmd);
+               return (g_last_exit_status);
+       }
 	pid = fork();
 	if (pid == 0)
 	{
@@ -132,11 +169,13 @@ int     execute_single_command(Command *cmd)
 		perror("execve");
 		exit(127);
 	}
-	else if (pid > 0)
-	{
-		waitpid(pid, &status, 0);
-		return (WIFEXITED(status) ? WEXITSTATUS(status) : 1);
-	}
+       else if (pid > 0)
+       {
+               waitpid(pid, &status, 0);
+               g_last_exit_status =
+                       (WIFEXITED(status) ? WEXITSTATUS(status) : 1);
+               return (g_last_exit_status);
+       }
 	else
 	{
 		perror("fork");
@@ -251,12 +290,13 @@ static int	wait_all_processes(pid_t *pids, int cmd_count)
 
 	i = 0;
 	status = 0;
-	while (i < cmd_count)
-	{
-		waitpid(pids[i], &status, 0);
-		i++;
-	}
-	return (WIFEXITED(status) ? WEXITSTATUS(status) : 1);
+       while (i < cmd_count)
+       {
+               waitpid(pids[i], &status, 0);
+               i++;
+       }
+       g_last_exit_status = WIFEXITED(status) ? WEXITSTATUS(status) : 1;
+       return (g_last_exit_status);
 }
 
 int	execute_pipeline(Command *commands, int cmd_count)

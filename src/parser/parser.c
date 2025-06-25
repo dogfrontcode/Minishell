@@ -1,32 +1,61 @@
 #include "../../includes/minishell.h"
 
 // Função para verificar se um comando é válido (built-in ou externo)
+static int      command_in_path(char *cmd_name)
+{
+       char    *path_env;
+       char    **dirs;
+       char    *tmp;
+       char    *full;
+       int             i;
+
+       path_env = getenv("PATH");
+       if (!path_env)
+               return (0);
+       dirs = ft_split(path_env, ':');
+       if (!dirs)
+               return (0);
+       i = 0;
+       while (dirs[i])
+       {
+               tmp = ft_strjoin(dirs[i], "/");
+               if (!tmp)
+                       break ;
+               full = ft_strjoin(tmp, cmd_name);
+               free(tmp);
+               if (!full)
+                       break ;
+               if (access(full, F_OK) == 0)
+               {
+                       int j = 0;
+                       while (dirs[j])
+                               free(dirs[j++]);
+                       free(dirs);
+                       free(full);
+                       return (1);
+               }
+               free(full);
+               i++;
+       }
+       i = 0;
+       while (dirs[i])
+               free(dirs[i++]);
+       free(dirs);
+       return (0);
+}
+
 static int is_valid_command(char *cmd_name)
 {
-	char *path;
-	
-	if (!cmd_name)
-		return (0);
+       if (!cmd_name)
+               return (0);
 
-	// Verifica built-ins
-	if (is_builtin(cmd_name))
-		return (1);
+       if (is_builtin(cmd_name))
+               return (1);
 
-	// Verifica comandos com path absoluto
-	if (ft_strchr(cmd_name, '/'))
-		return (access(cmd_name, F_OK) == 0);
+       if (ft_strchr(cmd_name, '/'))
+               return (access(cmd_name, F_OK) == 0);
 
-	// Verifica em /bin (simplificado)
-	path = malloc(ft_strlen(cmd_name) + 6);
-	if (!path)
-		return (0);
-	ft_strlcpy(path, "/bin/", 6);
-	ft_strlcat(path, cmd_name, ft_strlen(cmd_name) + 6);
-	
-	int exists = (access(path, F_OK) == 0);
-	free(path);
-	
-	return (exists);
+       return (command_in_path(cmd_name));
 }
 
 // Função para converter TokenType em RedirType
