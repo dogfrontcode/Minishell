@@ -5,7 +5,6 @@
 - ✅ **Parser Estruturado** (100%) 
 - ✅ **Pipelines Funcionando** (100%)
 - ✅ **Sinais Implementados** (100%)
-- ✅ **Built-ins Básicos** (echo, pwd, env, exit)
 - ✅ **Validação Sintática** (90%)
 - ✅ **Gestão de Memória** (100%)
 
@@ -50,6 +49,10 @@ echo $USER                  # User variables
 **Arquivos para criar:**
 - `src/parser/expand.c`
 - Atualizar `src/parser/tokenizer.c`
+## 🛭 **Próximo Módulo: Execução**
+- Integrar redirecionamentos ao pipeline
+- Suportar múltiplos pipes
+- Implementar busca no PATH para comandos externos
 
 ---
 

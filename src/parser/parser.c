@@ -54,30 +54,30 @@ static int validate_syntax(Token *tokens, int token_count)
 		return (1);
 
 	// Verifica se começa ou termina com pipe
-	if (tokens[0].type == PIPE || tokens[token_count - 1].type == PIPE)
-	{
-		printf("minishell: syntax error near unexpected token `|'\n");
-		return (0);
-	}
+        if (tokens[0].type == PIPE || tokens[token_count - 1].type == PIPE)
+        {
+                printf("minishell: syntax error near unexpected token `|'\n");
+                return (0);
+        }
 
 	i = 0;
 	while (i < token_count)
 	{
 		// Verifica pipes consecutivos
-		if (tokens[i].type == PIPE && i + 1 < token_count && 
-			tokens[i + 1].type == PIPE)
-		{
-			printf("minishell: syntax error near unexpected token `|'\n");
-			return (0);
-		}
+                if (tokens[i].type == PIPE && i + 1 < token_count &&
+                        tokens[i + 1].type == PIPE)
+                {
+                        printf("minishell: syntax error near unexpected token `|'\n");
+                        return (0);
+                }
 
 		// Verifica se há comando antes do pipe
 		if (tokens[i].type == PIPE)
 		{
 			if (!has_command_in_group)
 			{
-				printf("minishell: syntax error: missing command before pipe\n");
-				return (0);
+                                printf("minishell: syntax error: missing command before pipe\n");
+                                return (0);
 			}
 			has_command_in_group = 0; // Reset para próximo grupo
 		}
@@ -101,18 +101,19 @@ static int validate_syntax(Token *tokens, int token_count)
 			 tokens[i].type == APPEND || tokens[i].type == HEREDOC) &&
 			(i + 1 >= token_count || tokens[i + 1].type != WORD))
 		{
-			printf("minishell: syntax error near unexpected token `newline'\n");
-			return (0);
-		}
+                        printf("minishell: syntax error near unexpected token `%s'\n",
+                                (i + 1 >= token_count) ? "newline" : tokens[i + 1].value);
+                        return (0);
+                }
 
 		// Verifica redirecionador seguido de pipe
 		if ((tokens[i].type == REDIR_IN || tokens[i].type == REDIR_OUT ||
 			 tokens[i].type == APPEND || tokens[i].type == HEREDOC) &&
 			i + 1 < token_count && tokens[i + 1].type == PIPE)
 		{
-			printf("minishell: syntax error near unexpected token `|'\n");
-			return (0);
-		}
+                        printf("minishell: syntax error near unexpected token `|'\n");
+                        return (0);
+                }
 
 		i++;
 	}

@@ -1,5 +1,75 @@
 #include "../../includes/minishell.h"
 
+extern int g_last_exit_status;
+
+static char *itoa_simple(int n)
+{
+    char buffer[12];
+    snprintf(buffer, sizeof(buffer), "%d", n);
+    return ft_strdup(buffer);
+}
+
+static char *append_char(char *str, char c)
+{
+    char tmp[2];
+    char *new_str;
+
+    tmp[0] = c;
+    tmp[1] = '\0';
+    new_str = ft_strjoin(str, tmp);
+    free(str);
+    return new_str;
+}
+
+static char *expand_variables(const char *str)
+{
+    char *result;
+    int i;
+
+    result = ft_strdup("");
+    i = 0;
+    while (str[i])
+    {
+        if (str[i] == '$')
+        {
+            if (str[i + 1] == '?')
+            {
+                char *num = itoa_simple(g_last_exit_status);
+                char *tmp = ft_strjoin(result, num);
+                free(result);
+                result = tmp;
+                free(num);
+                i += 2;
+                continue;
+            }
+            else if (ft_isalpha(str[i + 1]) || str[i + 1] == '_')
+            {
+                int start = i + 1;
+                int len = 0;
+                char *name;
+                char *val;
+                char *tmp;
+
+                while (ft_isalnum(str[start + len]) || str[start + len] == '_')
+                    len++;
+                name = ft_substr(str, start, len);
+                val = getenv(name);
+                if (!val)
+                    val = "";
+                tmp = ft_strjoin(result, val);
+                free(result);
+                result = tmp;
+                free(name);
+                i = start + len;
+                continue;
+            }
+        }
+        result = append_char(result, str[i]);
+        i++;
+    }
+    return result;
+}
+
 // Funções auxiliares
 int is_quote(char c)
 {
@@ -38,32 +108,65 @@ static TokenType get_token_type(const char *value)
 // Função para processar aspas e retornar o conteúdo entre aspas
 static char *process_quotes(const char *input, int *i, char quote_char)
 {
-	int start = ++(*i); // Pula a primeira aspa
-	int len = 0;
-	char *result;
+    char *result;
 
-	// Encontra a aspa fechando
-	while (input[*i] && input[*i] != quote_char)
-	{
-		(*i)++;
-		len++;
-	}
+    result = ft_strdup("");
+    (*i)++; // pula a aspa inicial
+    while (input[*i] && input[*i] != quote_char)
+    {
+        if (input[*i] == '\\' && input[*i + 1])
+        {
+            if (input[*i + 1] == quote_char || input[*i + 1] == '$' || input[*i + 1] == '\\')
+            {
+                result = append_char(result, input[*i + 1]);
+                *i += 2;
+                continue;
+            }
+        }
+        if (quote_char == '"' && input[*i] == '$')
+        {
+            if (input[*i + 1] == '?')
+            {
+                char *num = itoa_simple(g_last_exit_status);
+                char *tmp = ft_strjoin(result, num);
+                free(result);
+                result = tmp;
+                free(num);
+                *i += 2;
+                continue;
+            }
+            else if (ft_isalpha(input[*i + 1]) || input[*i + 1] == '_')
+            {
+                int start = *i + 1;
+                int len = 0;
+                char *name;
+                char *val;
 
-	// TODO: Verificar se as aspas foram fechadas
-	if (input[*i] != quote_char)
-	{
-		// Erro: aspas não fechadas
-		return (NULL);
-	}
-
-	// Aloca memória e copia o conteúdo
-	result = malloc(sizeof(char) * (len + 1));
-	if (!result)
-		return (NULL);
-
-	ft_strlcpy(result, &input[start], len + 1);
-	(*i)++; // Pula a aspa fechando
-	return (result);
+                while (ft_isalnum(input[start + len]) || input[start + len] == '_')
+                    len++;
+                name = ft_substr(input, start, len);
+                val = getenv(name);
+                if (!val)
+                    val = "";
+                char *tmp2 = ft_strjoin(result, val);
+                free(result);
+                result = tmp2;
+                free(name);
+                *i = start + len;
+                continue;
+            }
+        }
+        result = append_char(result, input[*i]);
+        (*i)++;
+    }
+    if (input[*i] != quote_char)
+    {
+        printf("minishell: unclosed quote\n");
+        free(result);
+        return NULL;
+    }
+    (*i)++; // pula a aspa final
+    return result;
 }
 
 // Função para processar metacaracteres (operadores)
@@ -89,24 +192,18 @@ static char *process_metachar(const char *input, int *i)
 // Função para processar palavras normais
 static char *process_word(const char *input, int *i)
 {
-	int start = *i;
-	int len = 0;
-	char *result;
+    char *result;
 
-	// Conta caracteres até encontrar espaço ou metacaractere
-	while (input[*i] && !is_whitespace(input[*i]) && 
-		   !is_metachar(input[*i]) && !is_quote(input[*i]))
-	{
-		(*i)++;
-		len++;
-	}
-
-	result = malloc(sizeof(char) * (len + 1));
-	if (!result)
-		return (NULL);
-
-	ft_strlcpy(result, &input[start], len + 1);
-	return (result);
+    result = ft_strdup("");
+    while (input[*i] && !is_whitespace(input[*i]) &&
+           !is_metachar(input[*i]) && !is_quote(input[*i]))
+    {
+        result = append_char(result, input[*i]);
+        (*i)++;
+    }
+    char *expanded = expand_variables(result);
+    free(result);
+    return expanded;
 }
 
 // Função principal do lexer
@@ -121,8 +218,7 @@ Token *lexer(const char *input, int *token_count)
 	if (!input)
 		return (NULL);
 
-	// TODO: alocar dinamicamente tokens
-	tokens = malloc(sizeof(Token) * capacity);
+        tokens = malloc(sizeof(Token) * capacity);
 	if (!tokens)
 		return (NULL);
 

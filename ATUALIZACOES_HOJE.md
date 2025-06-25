@@ -39,6 +39,16 @@ graph TD
 
 ---
 
+## 🧩 **Pendências para o Parser Ficar 100%**
+
+- [ ] Verificar fechamento correto de aspas e reportar erro se faltar `"` ou `'`.
+- [ ] Realocar dinamicamente o array de tokens e comandos sem limites fixos.
+- [ ] Implementar expansão de variáveis (`$VAR` e `$?`) no lexer.
+- [ ] Tratar caracteres de escape dentro de aspas (ex.: `\"`, `\$`).
+- [ ] Melhorar mensagens de sintaxe para redirecionamentos e pipes incorretos.
+
+---
+
 ## 🛠️ **Funcionalidades Implementadas**
 
 ### **1. Análise Léxica (Tokenizer)**
@@ -238,6 +248,11 @@ minishell/
 - [ ] **Executor de Pipelines** (`cmd1 | cmd2`)
 - [ ] **Redirecionamentos** (`>`, `<`, `>>`, `<<`)
 - [ ] **Comandos Externos** (`ls`, `cat`, `grep`, etc.)
+
+### **Próximo Módulo: Execução**
+- [ ] Integrar redirecionamentos ao executor
+- [ ] Suportar múltiplos pipes em sequência
+- [ ] Tratar PATH lookup para comandos externos
 
 ### **Média Prioridade**
 - [ ] **Built-ins Restantes** (`cd`, `export`, `unset`)
