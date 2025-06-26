@@ -17,6 +17,10 @@ int	is_builtin(char *cmd_name)
 		return (1);
 	if (ft_strncmp(cmd_name, "cd", 2) == 0 && ft_strlen(cmd_name) == 2)
 		return (1);
+	if (ft_strncmp(cmd_name, "export", 6) == 0 && ft_strlen(cmd_name) == 6)
+		return (1);
+	if (ft_strncmp(cmd_name, "unset", 5) == 0 && ft_strlen(cmd_name) == 5)
+		return (1);
 	return (0);
 }
 
@@ -74,6 +78,82 @@ static void	execute_env(void)
 	}
 }
 
+static void	execute_cd(char **args, int arg_count)
+{
+	char	*path;
+	char	*home;
+
+	if (arg_count == 1)
+	{
+		home = getenv("HOME");
+		if (!home)
+		{
+			printf("cd: HOME not set\n");
+			return;
+		}
+		path = home;
+	}
+	else
+		path = args[1];
+	
+	if (chdir(path) == -1)
+		perror("cd");
+}
+
+static void	execute_export(char **args, int arg_count)
+{
+	char	*equal_sign;
+	char	*name;
+	char	*value;
+	int		i;
+
+	if (arg_count == 1)
+	{
+		// Sem argumentos, mostra todas as variáveis exportadas
+		execute_env();
+		return;
+	}
+	
+	i = 1;
+	while (i < arg_count)
+	{
+		equal_sign = ft_strchr(args[i], '=');
+		if (equal_sign)
+		{
+			// Formato: VAR=value
+			name = ft_substr(args[i], 0, equal_sign - args[i]);
+			value = equal_sign + 1;
+			if (name && setenv(name, value, 1) == -1)
+				perror("export");
+			if (name)
+				free(name);
+		}
+		else
+		{
+			// Formato: VAR (sem valor, apenas marca como exportada)
+			if (setenv(args[i], "", 1) == -1)
+				perror("export");
+		}
+		i++;
+	}
+}
+
+static void	execute_unset(char **args, int arg_count)
+{
+	int	i;
+
+	if (arg_count == 1)
+		return; // Sem argumentos, não faz nada
+	
+	i = 1;
+	while (i < arg_count)
+	{
+		if (unsetenv(args[i]) == -1)
+			perror("unset");
+		i++;
+	}
+}
+
 int	execute_builtin(Command *cmd)
 {
 	if (!cmd->args || cmd->arg_count == 0)
@@ -87,6 +167,15 @@ int	execute_builtin(Command *cmd)
 	else if (ft_strncmp(cmd->args[0], "env", 3) == 0 
 		&& ft_strlen(cmd->args[0]) == 3)
 		execute_env();
+	else if (ft_strncmp(cmd->args[0], "cd", 2) == 0 
+		&& ft_strlen(cmd->args[0]) == 2)
+		execute_cd(cmd->args, cmd->arg_count);
+	else if (ft_strncmp(cmd->args[0], "export", 6) == 0 
+		&& ft_strlen(cmd->args[0]) == 6)
+		execute_export(cmd->args, cmd->arg_count);
+	else if (ft_strncmp(cmd->args[0], "unset", 5) == 0 
+		&& ft_strlen(cmd->args[0]) == 5)
+		execute_unset(cmd->args, cmd->arg_count);
 	else if (ft_strncmp(cmd->args[0], "exit", 4) == 0 
 		&& ft_strlen(cmd->args[0]) == 4)
 		exit(0);

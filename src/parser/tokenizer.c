@@ -35,11 +35,75 @@ static TokenType get_token_type(const char *value)
 		return (WORD);
 }
 
+// Declaração forward
+static char *expand_variable(const char *var_name);
+
+// Função para expandir variáveis dentro de aspas duplas
+static char *expand_in_double_quotes(const char *content)
+{
+	char *result;
+	char *expanded;
+	char *var_name;
+	int i = 0;
+	int len = 0;
+	int result_len = 0;
+	int var_start;
+	
+	// Primeira passagem: calcula tamanho necessário
+	result_len = ft_strlen(content) * 2; // Estimativa
+	result = malloc(result_len);
+	if (!result)
+		return (NULL);
+	result[0] = '\0';
+	
+	while (content[i])
+	{
+		if (content[i] == '$' && content[i + 1] && content[i + 1] != ' ')
+		{
+			i++; // Pula o $
+			var_start = i;
+			len = 0;
+			
+			// Conta caracteres da variável
+			while (content[i] && (ft_isalnum(content[i]) || content[i] == '_' || content[i] == '?'))
+			{
+				i++;
+				len++;
+			}
+			
+			// Extrai nome da variável
+			var_name = malloc(len + 1);
+			if (var_name)
+			{
+				ft_strlcpy(var_name, &content[var_start], len + 1);
+				expanded = expand_variable(var_name);
+				if (expanded)
+				{
+					ft_strlcat(result, expanded, result_len);
+					free(expanded);
+				}
+				free(var_name);
+			}
+		}
+		else
+		{
+			// Adiciona caractere normal
+			len = ft_strlen(result);
+			result[len] = content[i];
+			result[len + 1] = '\0';
+			i++;
+		}
+	}
+	
+	return (result);
+}
+
 // Função para processar aspas e retornar o conteúdo entre aspas
 static char *process_quotes(const char *input, int *i, char quote_char)
 {
 	int start = ++(*i); // Pula a primeira aspa
 	int len = 0;
+	char *content;
 	char *result;
 
 	// Encontra a aspa fechando
@@ -56,13 +120,22 @@ static char *process_quotes(const char *input, int *i, char quote_char)
        }
 
 	// Aloca memória e copia o conteúdo
-	result = malloc(sizeof(char) * (len + 1));
-	if (!result)
+	content = malloc(sizeof(char) * (len + 1));
+	if (!content)
 		return (NULL);
 
-	ft_strlcpy(result, &input[start], len + 1);
+	ft_strlcpy(content, &input[start], len + 1);
 	(*i)++; // Pula a aspa fechando
-	return (result);
+	
+	// Se aspas duplas, expande variáveis; se simples, mantém literal
+	if (quote_char == '"')
+	{
+		result = expand_in_double_quotes(content);
+		free(content);
+		return (result);
+	}
+	else
+		return (content);
 }
 
 // Função para processar metacaracteres (operadores)
@@ -85,14 +158,68 @@ static char *process_metachar(const char *input, int *i)
 	return (result);
 }
 
-// Função para processar palavras normais
-static char *process_word(const char *input, int *i)
+// Função para expandir variáveis de ambiente
+static char *expand_variable(const char *var_name)
+{
+	char *value;
+	extern int g_last_exit_status;
+
+	if (!var_name)
+		return (ft_strdup(""));
+
+	// Variável especial $?
+	if (ft_strncmp(var_name, "?", 1) == 0 && ft_strlen(var_name) == 1)
+	{
+		value = malloc(12); // Suficiente para um int
+		if (!value)
+			return (NULL);
+		sprintf(value, "%d", g_last_exit_status);
+		return (value);
+	}
+
+	// Variáveis de ambiente normais
+	value = getenv(var_name);
+	if (value)
+		return (ft_strdup(value));
+	else
+		return (ft_strdup(""));
+}
+
+// Função para processar palavras com expansão de variáveis
+static char *process_word_with_expansion(const char *input, int *i)
 {
 	int start = *i;
 	int len = 0;
 	char *result;
+	char *expanded;
+	char *var_name;
 
-	// Conta caracteres até encontrar espaço ou metacaractere
+	// Se começa com $, expande a variável
+	if (input[*i] == '$' && input[*i + 1] && input[*i + 1] != ' ')
+	{
+		(*i)++; // Pula o $
+		start = *i;
+		
+		// Conta caracteres da variável
+		while (input[*i] && (ft_isalnum(input[*i]) || input[*i] == '_' || input[*i] == '?'))
+		{
+			(*i)++;
+			len++;
+		}
+
+		// Extrai nome da variável
+		var_name = malloc(sizeof(char) * (len + 1));
+		if (!var_name)
+			return (NULL);
+		ft_strlcpy(var_name, &input[start], len + 1);
+
+		// Expande a variável
+		expanded = expand_variable(var_name);
+		free(var_name);
+		return (expanded);
+	}
+
+	// Processa palavra normal
 	while (input[*i] && !is_whitespace(input[*i]) && 
 		   !is_metachar(input[*i]) && !is_quote(input[*i]))
 	{
@@ -106,6 +233,12 @@ static char *process_word(const char *input, int *i)
 
 	ft_strlcpy(result, &input[start], len + 1);
 	return (result);
+}
+
+// Função para processar palavras normais (mantida para compatibilidade)
+static char *process_word(const char *input, int *i)
+{
+	return (process_word_with_expansion(input, i));
 }
 
 // Função principal do lexer

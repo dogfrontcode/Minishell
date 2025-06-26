@@ -174,7 +174,9 @@ static int count_commands(Token *tokens, int token_count)
 // Função para inicializar um comando
 static void init_command(Command *cmd)
 {
-	cmd->args = NULL;
+	cmd->args = malloc(sizeof(char *));
+	if (cmd->args)
+		cmd->args[0] = NULL;
 	cmd->arg_count = 0;
 	cmd->redirs = NULL;
 	cmd->redir_count = 0;
@@ -185,7 +187,7 @@ static int add_argument(Command *cmd, char *arg)
 {
 	char **new_args;
 	
-	new_args = realloc(cmd->args, sizeof(char *) * (cmd->arg_count + 1));
+	new_args = realloc(cmd->args, sizeof(char *) * (cmd->arg_count + 2));
 	if (!new_args)
 		return (0);
 	
@@ -195,6 +197,7 @@ static int add_argument(Command *cmd, char *arg)
 		return (0);
 	
 	cmd->arg_count++;
+	cmd->args[cmd->arg_count] = NULL; // Termina array com NULL para execve
 	return (1);
 }
 
