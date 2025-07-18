@@ -293,101 +293,10 @@ static char *expand_variable(const char *var_name)
 		return (ft_strdup(""));
 }
 
-<<<<<<< HEAD
 
 
 
-=======
-// Função para processar palavras com expansão de variáveis
-static char *process_word_with_expansion(const char *input, int *i)
-{
-	char *result = ft_strdup("");
-	char *temp;
-	char *part;
-	int start;
-	int len;
-	char *var_name;
-	char *expanded;
 
-	if (!result)
-		return (NULL);
-
-	// Continua processando até encontrar espaço ou metacharacter
-	while (input[*i] && !is_whitespace(input[*i]) && !is_metachar(input[*i]) && !is_quote(input[*i]))
-	{
-		if (input[*i] == '$' && input[*i + 1] && input[*i + 1] != ' ')
-		{
-			// Processa variável
-			(*i)++; // Pula o $
-			start = *i;
-			len = 0;
-			
-			// Trata $? como caso especial (sempre 1 caractere)
-			if (input[*i] == '?')
-			{
-				(*i)++;
-				len = 1;
-			}
-			else
-			{
-				// Conta caracteres da variável normal
-				while (input[*i] && (ft_isalnum(input[*i]) || input[*i] == '_'))
-				{
-					(*i)++;
-					len++;
-				}
-			}
-
-			// Extrai nome da variável
-			var_name = malloc(sizeof(char) * (len + 1));
-			if (!var_name)
-			{
-				free(result);
-				return (NULL);
-			}
-			ft_strlcpy(var_name, &input[start], len + 1);
-
-			// Expande a variável
-			expanded = expand_variable(var_name);
-			free(var_name);
-			
-			part = expanded ? expanded : ft_strdup("");
-		}
-		else
-		{
-			// Processa texto normal até encontrar $, espaço ou metachar
-			start = *i;
-			while (input[*i] && !is_whitespace(input[*i]) && 
-				   !is_metachar(input[*i]) && !is_quote(input[*i]) && input[*i] != '$')
-				(*i)++;
-			
-			part = malloc((*i - start) + 1);
-			if (!part)
-			{
-				free(result);
-				return (NULL);
-			}
-			ft_strlcpy(part, &input[start], (*i - start) + 1);
-		}
-		
-		// Concatena a parte ao resultado
-		temp = ft_strjoin(result, part);
-		free(result);
-		free(part);
-		result = temp;
-		if (!result)
-			return (NULL);
-	}
-
-	return (result);
-}
-
-// Função para processar palavras normais (mantida para compatibilidade)
-static char *process_word(const char *input, int *i)
-{
-	return (process_word_with_expansion(input, i));
-}
->>>>>>> 7705892 (testando alteracao builtins)
 
 // Função principal do lexer
 Token *lexer(const char *input, int *token_count)
