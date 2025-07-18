@@ -78,18 +78,24 @@ static void	execute_env(void)
 	}
 }
 
-static void	execute_cd(char **args, int arg_count)
+static int	execute_cd(char **args, int arg_count)
 {
 	char	*path;
 	char	*home;
 
+	if (arg_count > 2)
+	{
+		fprintf(stderr, "minishell: cd: too many arguments\n");
+		return (1);
+	}
+	
 	if (arg_count == 1)
 	{
 		home = getenv("HOME");
 		if (!home)
 		{
-			printf("cd: HOME not set\n");
-			return;
+			fprintf(stderr, "cd: HOME not set\n");
+			return (1);
 		}
 		path = home;
 	}
@@ -97,21 +103,49 @@ static void	execute_cd(char **args, int arg_count)
 		path = args[1];
 	
 	if (chdir(path) == -1)
+	{
 		perror("cd");
+		return (1);
+	}
+	return (0);
 }
 
-static void	execute_export(char **args, int arg_count)
+// Função para validar nomes de variáveis
+static int	is_valid_identifier(const char *name)
+{
+	int i;
+
+	if (!name || !*name)
+		return (0);
+	
+	// Primeiro caractere deve ser letra ou underscore
+	if (!ft_isalpha(name[0]) && name[0] != '_')
+		return (0);
+	
+	// Resto deve ser alfanumérico ou underscore
+	i = 1;
+	while (name[i])
+	{
+		if (!ft_isalnum(name[i]) && name[i] != '_')
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+static int	execute_export(char **args, int arg_count)
 {
 	char	*equal_sign;
 	char	*name;
 	char	*value;
 	int		i;
+	int		exit_code = 0;
 
 	if (arg_count == 1)
 	{
 		// Sem argumentos, mostra todas as variáveis exportadas
 		execute_env();
-		return;
+		return (0);
 	}
 	
 	i = 1;
@@ -123,35 +157,125 @@ static void	execute_export(char **args, int arg_count)
 			// Formato: VAR=value
 			name = ft_substr(args[i], 0, equal_sign - args[i]);
 			value = equal_sign + 1;
-			if (name && setenv(name, value, 1) == -1)
-				perror("export");
-			if (name)
+			
+			if (!name || !is_valid_identifier(name))
+			{
+				fprintf(stderr, "minishell: export: `%s': not a valid identifier\n", args[i]);
+				exit_code = 1;
+				if (name)
+					free(name);
+			}
+			else
+			{
+				if (setenv(name, value, 1) == -1)
+				{
+					perror("export");
+					exit_code = 1;
+				}
 				free(name);
+			}
 		}
 		else
 		{
 			// Formato: VAR (sem valor, apenas marca como exportada)
-			if (setenv(args[i], "", 1) == -1)
-				perror("export");
+			if (!is_valid_identifier(args[i]))
+			{
+				fprintf(stderr, "minishell: export: `%s': not a valid identifier\n", args[i]);
+				exit_code = 1;
+			}
+			else
+			{
+				if (setenv(args[i], "", 1) == -1)
+				{
+					perror("export");
+					exit_code = 1;
+				}
+			}
 		}
 		i++;
 	}
+	return (exit_code);
 }
 
-static void	execute_unset(char **args, int arg_count)
+static int	execute_unset(char **args, int arg_count)
 {
 	int	i;
+	int	exit_code = 0;
 
 	if (arg_count == 1)
-		return; // Sem argumentos, não faz nada
+		return (0); // Sem argumentos, não faz nada
 	
 	i = 1;
 	while (i < arg_count)
 	{
-		if (unsetenv(args[i]) == -1)
-			perror("unset");
+		if (!is_valid_identifier(args[i]))
+		{
+			fprintf(stderr, "minishell: unset: `%s': not a valid identifier\n", args[i]);
+			exit_code = 1;
+		}
+		else
+		{
+			if (unsetenv(args[i]) == -1)
+			{
+				perror("unset");
+				exit_code = 1;
+			}
+		}
 		i++;
 	}
+	return (exit_code);
+}
+
+// Função para verificar se uma string é numérica
+static int	is_numeric(const char *str)
+{
+	int i = 0;
+	
+	if (!str || !*str)
+		return (0);
+	
+	// Permite + ou - no início
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	
+	// Deve ter pelo menos um dígito após o sinal (se houver)
+	if (!str[i])
+		return (0);
+	
+	// Verifica se o resto são dígitos
+	while (str[i])
+	{
+		if (!ft_isdigit(str[i]))
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+static int	execute_exit(char **args, int arg_count)
+{
+	int exit_code = 0;
+	
+	if (arg_count > 2)
+	{
+		fprintf(stderr, "minishell: exit: too many arguments\n");
+		return (1);
+	}
+	
+	if (arg_count == 2)
+	{
+		if (!is_numeric(args[1]))
+		{
+			fprintf(stderr, "minishell: exit: %s: numeric argument required\n", args[1]);
+			exit(2);
+		}
+		exit_code = ft_atoi(args[1]);
+		// Aplica modulo 256 para obter valor entre 0-255
+		exit_code = ((exit_code % 256) + 256) % 256;
+	}
+	
+	exit(exit_code);
+	return (0); // Nunca será executado
 }
 
 int	execute_builtin(Command *cmd)
@@ -160,28 +284,36 @@ int	execute_builtin(Command *cmd)
 		return (1);
 	if (ft_strncmp(cmd->args[0], "echo", 4) == 0 
 		&& ft_strlen(cmd->args[0]) == 4)
+	{
 		execute_echo(cmd->args, cmd->arg_count);
+		return (0);
+	}
 	else if (ft_strncmp(cmd->args[0], "pwd", 3) == 0 
 		&& ft_strlen(cmd->args[0]) == 3)
+	{
 		execute_pwd();
+		return (0);
+	}
 	else if (ft_strncmp(cmd->args[0], "env", 3) == 0 
 		&& ft_strlen(cmd->args[0]) == 3)
+	{
 		execute_env();
+		return (0);
+	}
 	else if (ft_strncmp(cmd->args[0], "cd", 2) == 0 
 		&& ft_strlen(cmd->args[0]) == 2)
-		execute_cd(cmd->args, cmd->arg_count);
+		return (execute_cd(cmd->args, cmd->arg_count));
 	else if (ft_strncmp(cmd->args[0], "export", 6) == 0 
 		&& ft_strlen(cmd->args[0]) == 6)
-		execute_export(cmd->args, cmd->arg_count);
+		return (execute_export(cmd->args, cmd->arg_count));
 	else if (ft_strncmp(cmd->args[0], "unset", 5) == 0 
 		&& ft_strlen(cmd->args[0]) == 5)
-		execute_unset(cmd->args, cmd->arg_count);
+		return (execute_unset(cmd->args, cmd->arg_count));
 	else if (ft_strncmp(cmd->args[0], "exit", 4) == 0 
 		&& ft_strlen(cmd->args[0]) == 4)
-		exit(0);
+		return (execute_exit(cmd->args, cmd->arg_count));
 	else
 		return (1);
-	return (0);
 }
 
 static char     *get_command_path(char *cmd_name)
