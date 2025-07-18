@@ -11,6 +11,7 @@ static int	is_empty_line(char *str)
 	return (1);
 }
 
+/*
 static void	print_tokens(Token *tokens, int token_count)
 {
 	const char	*type_names[] = {"WORD", "PIPE", "REDIR_IN", 
@@ -73,15 +74,16 @@ static void	print_commands(Command *commands, int cmd_count)
 		i++;
 	}
 }
+*/
 
 static int	execute_commands(Command *commands, int cmd_count)
 {
 	int	exit_status;
 
-	printf("\n⚡ EXECUÇÃO:\n");
+	// printf("\n⚡ EXECUÇÃO:\n");
        exit_status = execute_pipeline(commands, cmd_count);
-	if (exit_status != 0 && cmd_count > 1)
-		printf("Pipeline executado com status: %d\n", exit_status);
+	// if (exit_status != 0 && cmd_count > 1)
+	//	printf("Pipeline executado com status: %d\n", exit_status);
 	return (exit_status);
 }
 
@@ -96,26 +98,26 @@ void	handle_prompt(char *input)
 	cmd_count = 0;
 	if (is_empty_line(input))
 		return ;
-	printf("\n🔍 ANÁLISE LÉXICA:\n");
-	printf("Input: \"%s\"\n", input);
+	// printf("\n🔍 ANÁLISE LÉXICA:\n");
+	// printf("Input: \"%s\"\n", input);
 	tokens = lexer(input, &token_count);
 	if (!tokens)
 	{
-		printf("❌ Erro no lexer!\n");
+		// printf("❌ Erro no lexer!\n");
 		return ;
 	}
-	print_tokens(tokens, token_count);
+	// print_tokens(tokens, token_count);
 	commands = parser(tokens, token_count, &cmd_count);
 	if (!commands)
 	{
-		printf("❌ Erro no parser!\n");
+		// printf("❌ Erro no parser!\n");
 		free_tokens(tokens, token_count);
 		return ;
 	}
-	print_commands(commands, cmd_count);
+	// print_commands(commands, cmd_count);
 	execute_commands(commands, cmd_count);
 	free_tokens(tokens, token_count);
 	free_commands(commands, cmd_count);
-	printf("─────────────────────────────\n");
+	// printf("─────────────────────────────\n");
 }
 

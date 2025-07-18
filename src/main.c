@@ -78,6 +78,7 @@ void	test_lexer_parser(const char *input)
 	printf("=========================\n\n");
 }
 
+/*
 static void	print_welcome_message(void)
 {
 	printf("🐚 Minishell iniciado! Digite 'exit' para sair.\n");
@@ -88,6 +89,7 @@ static void	print_welcome_message(void)
 	printf("   • ctrl-D: Sair da shell\n");
 	printf("   • ctrl-\\: Não faz nada (como no Bash)\n\n");
 }
+*/
 
 static int	handle_input(char *input)
 {
@@ -105,7 +107,7 @@ static int	handle_input(char *input)
        {
                add_history(input);
                handle_prompt(input);
-               printf("Exit status: %d\n", g_last_exit_status);
+               // printf("Exit status: %d\n", g_last_exit_status);
        }
 	free(input);
 	return (0);
@@ -119,7 +121,7 @@ int	main(int argc, char **argv, char **envp)
 	(void)argv;
 	(void)envp;
 	init_signals();
-	print_welcome_message();
+	// print_welcome_message();
 	while (1)
 	{
 		g_signal = 0;
