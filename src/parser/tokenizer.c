@@ -188,50 +188,84 @@ static char *expand_variable(const char *var_name)
 // Função para processar palavras com expansão de variáveis
 static char *process_word_with_expansion(const char *input, int *i)
 {
-	int start = *i;
-	int len = 0;
-	char *result;
-	char *expanded;
+	char *result = ft_strdup("");
+	char *temp;
+	char *part;
+	int start;
+	int len;
 	char *var_name;
+	char *expanded;
 
-	// Se começa com $, expande a variável
-	if (input[*i] == '$' && input[*i + 1] && input[*i + 1] != ' ')
-	{
-		(*i)++; // Pula o $
-		start = *i;
-		
-		// Conta caracteres da variável
-		while (input[*i] && (ft_isalnum(input[*i]) || input[*i] == '_' || input[*i] == '?'))
-		{
-			(*i)++;
-			len++;
-		}
-
-		// Extrai nome da variável
-		var_name = malloc(sizeof(char) * (len + 1));
-		if (!var_name)
-			return (NULL);
-		ft_strlcpy(var_name, &input[start], len + 1);
-
-		// Expande a variável
-		expanded = expand_variable(var_name);
-		free(var_name);
-		return (expanded);
-	}
-
-	// Processa palavra normal
-	while (input[*i] && !is_whitespace(input[*i]) && 
-		   !is_metachar(input[*i]) && !is_quote(input[*i]))
-	{
-		(*i)++;
-		len++;
-	}
-
-	result = malloc(sizeof(char) * (len + 1));
 	if (!result)
 		return (NULL);
 
-	ft_strlcpy(result, &input[start], len + 1);
+	// Continua processando até encontrar espaço ou metacharacter
+	while (input[*i] && !is_whitespace(input[*i]) && !is_metachar(input[*i]) && !is_quote(input[*i]))
+	{
+		if (input[*i] == '$' && input[*i + 1] && input[*i + 1] != ' ')
+		{
+			// Processa variável
+			(*i)++; // Pula o $
+			start = *i;
+			len = 0;
+			
+			// Trata $? como caso especial (sempre 1 caractere)
+			if (input[*i] == '?')
+			{
+				(*i)++;
+				len = 1;
+			}
+			else
+			{
+				// Conta caracteres da variável normal
+				while (input[*i] && (ft_isalnum(input[*i]) || input[*i] == '_'))
+				{
+					(*i)++;
+					len++;
+				}
+			}
+
+			// Extrai nome da variável
+			var_name = malloc(sizeof(char) * (len + 1));
+			if (!var_name)
+			{
+				free(result);
+				return (NULL);
+			}
+			ft_strlcpy(var_name, &input[start], len + 1);
+
+			// Expande a variável
+			expanded = expand_variable(var_name);
+			free(var_name);
+			
+			part = expanded ? expanded : ft_strdup("");
+		}
+		else
+		{
+			// Processa texto normal até encontrar $, espaço ou metachar
+			start = *i;
+			while (input[*i] && !is_whitespace(input[*i]) && 
+				   !is_metachar(input[*i]) && !is_quote(input[*i]) && input[*i] != '$')
+				(*i)++;
+			
+			part = malloc((*i - start) + 1);
+			if (!part)
+			{
+				free(result);
+				return (NULL);
+			}
+			ft_strlcpy(part, &input[start], (*i - start) + 1);
+		}
+		
+		// Concatena a parte ao resultado
+		temp = ft_strjoin(result, part);
+		free(result);
+		free(part);
+		result = temp;
+		if (!result)
+			return (NULL);
+	}
+
 	return (result);
 }
 
