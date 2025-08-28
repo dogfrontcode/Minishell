@@ -1,16 +1,11 @@
-# Arquivos de compilação
-*.o
-*.a
-
-# Executável do minishell
-minishell
-
-# Arquivos temporários do sistema
-.DS_Store
-*~
-*.swp
-*.swo
+*/*.o
+/objects/
+.vscode
 .vscode/
-
-# Arquivos de debug
-*.dSYM/ 
+/libft/libft.a
+minishell
+/testing/o_tests
+/testing/old_exec_tests
+/testing/todo_tests.md
+minishell_test.log
+.idea/

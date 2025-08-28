@@ -3,18 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   ft_isdigit.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mide-lim <mide-lim@student.42.rio>         +#+  +:+       +#+        */
+/*   By: mcombeau <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/25 13:38:14 by mide-lim          #+#    #+#             */
-/*   Updated: 2024/09/25 13:58:39 by mide-lim         ###   ########.fr       */
+/*   Created: 2021/11/22 13:53:06 by mcombeau          #+#    #+#             */
+/*   Updated: 2021/12/02 14:40:52 by mcombeau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+/*
+	DESCRIPTION :
+	The function ft_isdigit checks whether c is a digit character or not.
+
+	RETURN VALUE:
+	Non-zero if c is a digit, zero if not.
+*/
 
 int	ft_isdigit(int c)
 {
 	if (c >= '0' && c <= '9')
-		return (1);
+		return (c);
 	return (0);
 }

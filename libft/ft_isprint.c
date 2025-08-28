@@ -3,18 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   ft_isprint.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mide-lim <mide-lim@student.42.rio>         +#+  +:+       +#+        */
+/*   By: mcombeau <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/25 14:06:50 by mide-lim          #+#    #+#             */
-/*   Updated: 2024/09/25 14:08:49 by mide-lim         ###   ########.fr       */
+/*   Created: 2021/11/22 13:50:49 by mcombeau          #+#    #+#             */
+/*   Updated: 2021/12/02 14:42:17 by mcombeau         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+/*
+	DESCRIPTION :
+	The function ft_isprint checks whether c is a printable character or not.
+
+	RETURN VALUE :
+	Non-zero if c is printable, zero if not.
+*/
 
 int	ft_isprint(int c)
 {
-	if (c >= 32 && c <= 126)
-		return (1);
+	if (c >= ' ' && c <= '~')
+		return (c);
 	return (0);
 }
