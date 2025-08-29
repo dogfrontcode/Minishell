@@ -10,30 +10,31 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "minishell.h" // Inclui definições do minishell
 
 /* pwd_builtin:
-*	Executes the builtin pwd command and displays the
-*	current working directory path.
-*	Returns 0 if successful, 1 if an error occured.
+*       Executes the builtin pwd command and displays the
+*       current working directory path.
+*       Returns 0 if successful, 1 if an error occured.
 */
-int	pwd_builtin(t_data *data, char **args)
+int     pwd_builtin(t_data *data, char **args) // Implementa comando pwd
 {
-	char	buf[PATH_MAX];
-	char	*cwd;
+        char    buf[PATH_MAX]; // Buffer para armazenar caminho
+        char    *cwd; // Ponteiro para diretório atual
 
-	(void)args;
-	if (data->working_dir)
-	{
-		ft_putendl_fd(data->working_dir, STDOUT_FILENO);
-		return (EXIT_SUCCESS);
-	}
-	cwd = getcwd(buf, PATH_MAX);
-	if (cwd)
-	{
-		ft_putendl_fd(cwd, STDOUT_FILENO);
-		return (EXIT_SUCCESS);
-	}
-	errmsg_cmd("pwd", NULL, strerror(errno), errno);
-	return (EXIT_FAILURE);
+        (void)args; // Argumentos não utilizados
+        if (data->working_dir) // Se diretório de trabalho já é conhecido
+        {
+                ft_putendl_fd(data->working_dir, STDOUT_FILENO); // Imprime diretório armazenado
+                return (EXIT_SUCCESS); // Retorna sucesso
+        }
+        cwd = getcwd(buf, PATH_MAX); // Obtém diretório atual
+        if (cwd) // Se getcwd foi bem-sucedido
+        {
+                ft_putendl_fd(cwd, STDOUT_FILENO); // Imprime caminho atual
+                return (EXIT_SUCCESS); // Retorna sucesso
+        }
+        errmsg_cmd("pwd", NULL, strerror(errno), errno); // Exibe mensagem de erro
+        return (EXIT_FAILURE); // Retorna falha
 }
+
