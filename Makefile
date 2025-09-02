@@ -1,9 +1,9 @@
-# Program file name
-NAME	= minishell
+# Makefile
+NAME = minishell
 
 # Compiler and compilation flags
-CC		= clang
-CFLAGS	= -Werror -Wextra -Wall -gdwarf-4 -g
+CC = cc
+CFLAGS = -Wall -Wextra -Werror -g
 
 # Build files and directories
 SRC_PATH = ./sources/
