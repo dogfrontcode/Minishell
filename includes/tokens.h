@@ -42,3 +42,4 @@ void	add_token(t_token **list, t_token *new_token);
 char	*token_type_to_string(t_token_type type);
 
 #endif
+

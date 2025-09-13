@@ -1,113 +1,122 @@
-# Makefile
-NAME = minishell
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: minishell <minishell@student.42.fr>       +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2024/01/01 00:00:00 by minishell         #+#    #+#              #
+#    Updated: 2024/01/01 00:00:00 by minishell        ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
-# Compiler and compilation flags
-CC = cc
-CFLAGS = -Wall -Wextra -Werror -g
+# Program name
+NAME		= minishell
 
-# Build files and directories
-SRC_PATH = ./sources/
-OBJ_PATH = ./objects/
-INC_PATH = ./includes/
-SRC		= 	main.c \
-			utils/init_data.c \
-			env/env.c \
-			env/env_set.c \
-			lexer/parse_user_input.c \
-			lexer/tokenization.c \
-			lexer/tokenization_utils.c \
-			lexer/check_if_var.c \
-			lexer/lexer_grammar.c \
-			lexer/token_lst_utils.c \
-			lexer/token_lst_utils_2.c \
-			expansion/var_expander.c \
-			expansion/var_expander_utils.c \
-			expansion/identify_var.c \
-			expansion/quotes_handler.c \
-			expansion/quotes_remover.c \
-			expansion/recover_value.c \
-			expansion/replace_var.c \
-			parser/create_commands.c \
-			parser/parse_word.c \
-			parser/fill_args_echo.c \
-			parser/fill_args_echo_utils.c \
-			parser/fill_args_default.c \
-			parser/parse_input.c \
-			parser/parse_trunc.c \
-			parser/parse_append.c \
-			parser/parse_heredoc.c \
-			parser/parse_heredoc_utils.c \
-			parser/parse_pipe.c \
-			parser/cmd_lst_utils.c \
-			parser/cmd_lst_utils_cleanup.c \
-			builtins/export_builtin.c \
-			builtins/unset_builtin.c \
-			builtins/cd_builtin.c \
-			builtins/env_builtin.c \
-			builtins/pwd_builtin.c \
-			builtins/echo_builtin.c \
-			builtins/exit_builtin.c \
-			execution/execute.c \
-			execution/execute_cmd.c \
-			execution/execute_utils.c \
-			execution/parse_path.c \
-			redirections/pipe.c \
-			redirections/file_io.c \
-			utils/exit.c \
-			utils/error.c \
-			utils/cleanup.c \
-			signals/signal.c \
-			debug/debug.c
-SRCS	= $(addprefix $(SRC_PATH), $(SRC))
-OBJ		= $(SRC:.c=.o)
-OBJS	= $(addprefix $(OBJ_PATH), $(OBJ))
-INC		= -I $(INC_PATH) -I $(LIBFT_PATH)
+# Compiler and flags
+CC			= cc
+CFLAGS		= -Wall -Wextra -Werror -g
+INCLUDES	= -I./includes -I./libft
+LIBS		= -L./libft -lft -lreadline
 
-# Libft files and directories
-LIBFT_PATH = ./libft/
-LIBFT = ./libft/libft.a
+# Directories
+SRC_DIR		= src
+OBJ_DIR		= obj
+INC_DIR		= includes
+LIBFT_DIR	= libft
+
+# Source files by module
+MAIN_SRCS	= main.c
+
+LEXER_SRCS	= lexer/lexer.c
+
+PARSER_SRCS	= parser/parser.c \
+			  parser/tokenizer.c
+
+EXEC_SRCS	= exec/executor.c \
+			  exec/pipes.c \
+			  exec/heredoc.c
+
+BUILTIN_SRCS = builtins/echo.c \
+			   builtins/cd.c \
+			   builtins/pwd.c \
+			   builtins/export.c \
+			   builtins/unset.c \
+			   builtins/env.c \
+			   builtins/exit.c
+
+ENV_SRCS	= env/env_manager.c \
+			  env/expansion.c
+
+IO_SRCS		= io/redirections.c
+
+SIGNAL_SRCS	= signal/signals.c
+
+# Combine all sources
+SRCS		= $(MAIN_SRCS) \
+			  $(LEXER_SRCS) \
+			  $(PARSER_SRCS) \
+			  $(EXEC_SRCS) \
+			  $(BUILTIN_SRCS) \
+			  $(ENV_SRCS) \
+			  $(IO_SRCS) \
+			  $(SIGNAL_SRCS)
+
+# Object files
+OBJS		= $(SRCS:%.c=$(OBJ_DIR)/%.o)
+
+# Colors for output
+GREEN		= \033[0;32m
+YELLOW		= \033[0;33m
+RED			= \033[0;31m
+NC			= \033[0m
 
 # Main rule
-all: $(OBJ_PATH) $(LIBFT) $(NAME)
+all: libft $(NAME)
 
-# Objects directory rule
-$(OBJ_PATH):
-	mkdir -p $(OBJ_PATH)
-	mkdir -p $(OBJ_PATH)/builtins
-	mkdir -p $(OBJ_PATH)/lexer
-	mkdir -p $(OBJ_PATH)/expansion
-	mkdir -p $(OBJ_PATH)/parser
-	mkdir -p $(OBJ_PATH)/testing
-	mkdir -p $(OBJ_PATH)/env
-	mkdir -p $(OBJ_PATH)/execution
-	mkdir -p $(OBJ_PATH)/utils
-	mkdir -p $(OBJ_PATH)/redirections
-	mkdir -p $(OBJ_PATH)/signals
-	mkdir -p $(OBJ_PATH)/debug
+# Build libft
+libft:
+	@echo "$(YELLOW)Building libft...$(NC)"
+	@$(MAKE) -C $(LIBFT_DIR) --no-print-directory
 
-# Objects rule
-$(OBJ_PATH)%.o: $(SRC_PATH)%.c
-	$(CC) $(CFLAGS) -c $< -o $@ $(INC)
-
-# Project file rule
+# Build minishell
 $(NAME): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $@ $(INC) $(LIBFT) -l readline
+	@echo "$(YELLOW)Linking $(NAME)...$(NC)"
+	@$(CC) $(CFLAGS) $(OBJS) $(LIBS) -o $(NAME)
+	@echo "$(GREEN)✓ $(NAME) ready!$(NC)"
 
-# Libft rule
-$(LIBFT):
-	make -C $(LIBFT_PATH)
+# Compile object files
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(dir $@)
+	@echo "$(YELLOW)Compiling $<...$(NC)"
+	@$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-# Clean up build files rule
+# Clean object files
 clean:
-	rm -rf $(OBJ_PATH)
-	make -C $(LIBFT_PATH) clean
+	@echo "$(RED)Cleaning objects...$(NC)"
+	@$(MAKE) -C $(LIBFT_DIR) clean --no-print-directory
+	@rm -rf $(OBJ_DIR)
 
-# Remove program executable
+# Full clean
 fclean: clean
-	rm -f $(NAME)
-	make -C $(LIBFT_PATH) fclean
+	@echo "$(RED)Removing $(NAME)...$(NC)"
+	@$(MAKE) -C $(LIBFT_DIR) fclean --no-print-directory
+	@rm -f $(NAME)
 
-# Clean + remove executable
+# Rebuild
 re: fclean all
 
-.PHONY: all re clean fclean
+# Norminette check
+norm:
+	@echo "$(YELLOW)Checking norminette...$(NC)"
+	@norminette $(SRC_DIR) $(INC_DIR) | grep -E "(Error|Warning)" || echo "$(GREEN)✓ Norm OK$(NC)"
+
+# Run with valgrind
+valgrind: $(NAME)
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(NAME)
+
+# Debug with lldb
+debug: $(NAME)
+	lldb ./$(NAME)
+
+.PHONY: all clean fclean re libft norm valgrind debug
