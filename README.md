@@ -1,100 +1,154 @@
-# minishell
+# 42-minishell
 
-<p align="center">
-  <img src="https://github.com/mcombeau/mcombeau/blob/main/42_badges/minishelle.png" alt="Minishell 42 project badge"/>
-</p>
+The objective of this project is to create a simple shell, like an own little bash.<br>
+It is the first group project in the 42 core curriculum. <b>([tjensen42](https://github.com/tjensen42) && [hepple42](https://github.com/hepple42))</b>
 
-Minishell is a 42 school team project to create a basic shell program in C. It implements redirections and pipes, as well as environment variable expansions and the `cd`, `echo`, `env`, `exit`, `export`, `pwd` and `unset` builtin commands.
+## Project specifications
 
-> This project has been archived in the state it was in at the time of evaluation.
+For the project we were allowed to use GNU's readline library which handles the terminal interaction (history & input reading).
+For everything else the subject allows only to use a few low-level functions and a few POSIX system calls.
 
-## Status
+<b>Allowed functions:</b>
+```readline, rl_clear_history, rl_on_new_line,rl_replace_line, rl_redisplay, add_history, printf, malloc, free, write, access, open, read,close, fork, wait, waitpid, wait3, wait4, signal, sigaction, sigemptyset, sigaddset, kill, exit, getcwd, chdir, stat, lstat, fstat, unlink, execve, dup, dup2, pipe, opendir, readdir, closedir, strerror, perror, isatty, ttyname, ttyslot, ioctl, getenv, tcsetattr, tcgetattr, tgetent, tgetflag, tgetnum, tgetstr, tgoto, tputs```
 
-Validated 11/11/2022. Grade: 99%.
+## Features
 
-## Usage
+### Basics:
+- History of previous entered commands
+- Search and launch the right executable (based on the PATH variable, using a relative or an absolute path)
+- Environment variables ($ followed by a sequence of characters) expand to their values
+- Wildcards * in the current working directory
+- ctrl-C, ctrl-D and ctrl-\ behave like in bash
+- ```’``` (single quotes - prevent from interpreting meta-characters in quoted sequence)
+- ```"``` (double quotes - prevent from interpreting meta-characters in quoted sequence except for $)
+- ```$?``` expands to the last exit status
+- ```|``` connect cmds or groups with pipes; output of a cmd is connected to the input of the next cmd via a pipe
+- ```&&``` and ```||``` with parenthesis for priorities
 
-Clone the repository with the [minitester](https://github.com/mcombeau/minitester-minishell-tester) submodule:
+### Builtins:
+- ```echo``` with option -n
+- ```cd``` (relative or absolute path, ```-``` for OLDPWD, without arg for HOME)
+- ```pwd``` without options
+- ```export``` without options
+- ```unset``` without options
+- ```env``` without options
+- ```exit [exit_status]``` without options
+
+### Redirections:
+
+```[n]``` (optional) specifies the file descriptor, if not specified it is stdout/stdin
+
+- ```[n]< file``` Redirecting Input
+- ```[n]<< limiter``` Here Documents
+- ```[n]> file``` Redirecting Output
+- ```[n]>> file``` Appending Redirected Output
+
+## How to use
+
+The current version of minishell is developed and tested on macOS, but it should work on all UNIX/LINUX based systems as well.
+
+<b>Requirements:</b>
+- GCC / CLANG Compiler
+- GNU Make
+- GNU Readline library
+
 ```
-git clone --recurse-submodules git@github.com:mcombeau/minishell.git
+git clone https://github.com/tjensen42/42-minishell.git minishell
 ```
-
-To compile:
-
-```shell
-cd minishell && make
 ```
-
-To run the program:
-
-```shell
+cd minishell && make release
+```
+```
 ./minishell
 ```
 
-A prompt will appear. You may enter your commands to be executed.
-
-To run the included tester:
-```shell
-cd minitester/ && bash minitester.sh
+## Dependencies
+### Install readline with [brew](https://brew.sh/)
+```
+brew install readline
 ```
 
-## Supported Features
+```
+brew link --force readline
+```
 
-Minishell is a miniature shell program based on Bash. Minishell supports:
-* Prompt display
-* Command history (up and down arrows)
-* System executables available from the environment (`ls`, `cat`, `grep`, etc.)
-* Local executables (`./minishell`)
-* Builtin commands :
-  * `echo` (and option `-n`)
-  * `cd` (with only a relative or absolute path)
-  * `pwd` (no options)
-  * `export` (no options)
-  * `unset` (no options)
-  * `env` (no options or arguments)
-  * `exit` (with exit number but no other options) 
-* Pipes `|` which redirect output from one command to input for the next
-* Redirections:
-  * `>` redirects output
-  * `>>` redirects output in append mode
-  * `<` redirects input
-  * `<< DELIMITER` displays a new prompt, reads user input until reaching `DELIMITER`, redirects user input to command input (does not update history)
-* Environment variables (i.e. `$USER` or `$VAR`) that expand to their values.
-  * `$?` expands to the exit status of the most recently executed foreground pipeline.
-* User keyboard signals:
-  * `ctrl-c` displays a new prompt line.
-  * `ctrl-d` exits minishell
-  * `ctrl-\` does nothing
+Add the path to the lib
 
-However, Minishell does not support `\`, `;`, `&&`, `||`, or wildcards.
+Replace ~/.zshrc with ~/.bashrc if you use bash instead of zsh
+```
+echo 'export C_INCLUDE_PATH="/usr/local/opt/readline/include:$C_INCLUDE_PATH"' >> ~/.zshrc
+```
+```
+echo 'export LIBRARY_PATH="/usr/local/opt/readline/lib:$LIBRARY_PATH"' >> ~/.zshrc
+```
+```
+source ~/.zshrc
+```
 
----
-### Useful Resources for the Minishell Project
+### Install readline on 42 Macs
 
-:us: Articles in English about the concepts tackled in this project: 
+Install Brew, <b>only if it is not already installed:</b>
 
-* [Creating and Killing Child Processes in C](https://www.codequoi.com/en/creating-and-killing-child-processes-in-c/)
-* [Pipe: an Inter-Process Communication Method](https://www.codequoi.com/en/pipe-an-inter-process-communication-method/)
-* [Sending and Intercepting a Signal in C](https://www.codequoi.com/en/sending-and-intercepting-a-signal-in-c/)
-* [Handling a File by its Descriptor in C](https://www.codequoi.com/en/handling-a-file-by-its-descriptor-in-c/)
-* [Errno and Error Management in C](https://www.codequoi.com/en/errno-and-error-management-in-c/)
+```
+rm -rf $HOME/.brew && git clone --depth=1 https://github.com/Homebrew/brew $HOME/.brew && echo 'export PATH=$HOME/.brew/bin:$PATH' >> $HOME/.zshrc && source $HOME/.zshrc && brew update
+```
 
-:fr: Articles en français sur les concepts abordés dans ce projet :
+Install Readline library:
+```
+brew install readline
+```
 
-* [Créer et tuer des processus fils en C](https://www.codequoi.com/creer-et-tuer-des-processus-fils-en-c/)
-* [Pipe : une méthode de communication inter-processus](https://www.codequoi.com/pipe-une-methode-de-communication-inter-processus/)
-* [Envoyer et intercepter un signal en C](https://www.codequoi.com/envoyer-et-intercepter-un-signal-en-c/)
-* [Manipuler un fichier à l’aide de son descripteur en C](https://www.codequoi.com/manipuler-un-fichier-a-laide-de-son-descripteur-en-c/)
-* [Errno et la gestion d’erreur en C](https://www.codequoi.com/errno-et-la-gestion-derreur-en-c/)
+```
+brew link --force readline
+```
 
-Other useful links:
+```
+echo 'export C_INCLUDE_PATH="$HOME/.brew/include:$C_INCLUDE_PATH"' >> ~/.zshrc
+```
 
-* [Bash reference manual](https://www.gnu.org/software/bash/manual/bash.html)
-* Introduction to Systems Programming: a Hands-on Approach, [Chapter 5. Writing Your Own Shell](https://www.cs.purdue.edu/homes/grr/SystemsProgrammingBook/Book/Chapter5-WritingYourOwnShell.pdf)
-* [Stephen Brennan's Tutorial - Write a Shell in C](https://brennan.io/2015/01/16/write-a-shell-in-c/)
-* The Open Group Base Specifications, [Shell Command Language](https://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html)
-* [A Guide to Unix Shell Quoting](https://rg1-teaching.mpi-inf.mpg.de/unixffb-ss98/quoting-guide.html)
-* [Austin Tripp's Quick Tutorial on Bash Quotes](https://www.austintripp.ca/blog/2019/07/18/bash-quotes)
+```
+echo 'export LIBRARY_PATH="$HOME/.brew/lib:$LIBRARY_PATH"' >> ~/.zshrc
+```
+```
+source ~/.zshrc
+```
 
----
-Made by aquesada and mcombeau
+## Run tests
+
+To check if your minishell build was succesful you can run a tester, which compares most of the features with your current Bash installation. The test compares the stdout and the exit-code directly and checks in case of an error if both print something in stderr. 
+
+```
+make test
+```
+
+## Activate debug mode
+
+Enter minishell and export the DEBUG env:
+
+```
+export DEBUG=printer
+```
+
+For all next commands you will execute in the minishell you will see the different processing steps from the lexer and parser with syntax highlighting.
+
+## Change the command line prompt
+1. Enter the SHELL
+```
+./minishell
+```
+2. Export the PS1 env (also works in Bash and other similar shells)
+```
+export PS1='enter your prompt wish...$ '
+```
+
+
+<br>
+<hr>
+<b>*All 42 projects must be written in C (later C++) in accordance to the 42 School Norm.<br></b>
+<br>
+
+> #### Sample restrictions:
+> - All variables have to be declared and aligned at the top of each function
+> - Each function can not have more then 25 lines
+> - Projects should be created with allowed std functions otherwise it is cheating
+

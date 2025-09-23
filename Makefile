@@ -3,120 +3,98 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: minishell <minishell@student.42.fr>       +#+  +:+       +#+         #
+#    By: tjensen <tjensen@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/01/01 00:00:00 by minishell         #+#    #+#              #
-#    Updated: 2024/01/01 00:00:00 by minishell        ###   ########.fr        #
+#    Created: 2021/10/27 22:03:08 by tjensen           #+#    #+#              #
+#    Updated: 2022/07/25 20:43:58 by tjensen          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-# Program name
-NAME		= minishell
+NAME        := minishell
 
-# Compiler and flags
-CC			= cc
-CFLAGS		= -Wall -Wextra -Werror -g
-INCLUDES	= -I./includes -I./libft
-LIBS		= -L./libft -lft -lreadline
+CC          := gcc
+CFLAGS      := -Wall -Wextra -Werror -O2
 
-# Directories
-SRC_DIR		= src
-OBJ_DIR		= obj
-INC_DIR		= includes
-LIBFT_DIR	= libft
+CPPFLAGS    := -I./inc -I./libft
+DEPFLAGS     = -MT $@ -MMD -MP -MF $(DDIR)/$*.d
 
-# Source files by module
-MAIN_SRCS	= main.c
+LDFLAGS     := -L./libft
+LDLIBS      := -lft -lreadline
 
-LEXER_SRCS	= lexer/lexer.c
+VPATH       := src/ src/builtin/ src/cmd/ src/env/ src/exec/ src/expand/ \
+			   src/lexer/ src/parser/ src/printer/ src/redir/ src/signals/ \
+			   src/token/ src/utils/ src/utils/ft_printf/ src/utils/string_lib/
+SRCS        := minishell.c
+SRCS        += builtin_echo.c builtin_cd.c builtin_exit.c builtin_pwd.c \
+			   builtin_env.c builtin_export.c builtin_unset.c builtin.c
+SRCS        += cmd.c scmd.c
+SRCS        += env.c env_modify.c
+SRCS        += exec.c exec_pipeline.c exec_pipeline_pipes.c exec_scmd.c \
+			   exec_scmd_path.c exec_wait.c exec_group.c exec_exit_status.c
+SRCS        += expand.c expand_wildcard.c expand_wildcard_utils.c \
+			   expand_var.c expand_var_split.c
+SRCS        += lexer.c lexer_syntax.c lexer_token_other.c lexer_token_text.c
+SRCS        += parser.c parser_scmd.c parser_pipeline.c parser_group.c \
+			   parser_heredoc.c
+SRCS        += printer_token.c printer_scmd.c printer_cmd.c
+SRCS        += redir.c redir_undo.c
+SRCS        += signals.c
+SRCS        += token.c token_list.c
+SRCS        += utils_error.c utils_gnl.c utils_lst.c utils_split.c utils_str.c \
+			   ft_free_split.c ft_printf.c ft_printf_utils.c get_options.c \
+			   get_specs_d.c get_specs_x.c write_c.c write_d.c write_p.c \
+			   write_percent.c write_s.c write_u.c write_x.c \
+			   ft_lstnew.c ft_lstadd_back.c ft_lstclear.c ft_lstdelone.c \
+			   ft_lstlast.c ft_lstsize.c
 
-PARSER_SRCS	= parser/parser.c \
-			  parser/tokenizer.c
+ODIR        := obj
+OBJS        := $(SRCS:%.c=$(ODIR)/%.o)
 
-EXEC_SRCS	= exec/executor.c \
-			  exec/pipes.c \
-			  exec/heredoc.c
+DDIR        := $(ODIR)/.deps
+DEPS        := $(SRCS:%.c=$(DDIR)/%.d)
 
-BUILTIN_SRCS = builtins/echo.c \
-			   builtins/cd.c \
-			   builtins/pwd.c \
-			   builtins/export.c \
-			   builtins/unset.c \
-			   builtins/env.c \
-			   builtins/exit.c
+# **************************************************************************** #
+#	SYSTEM SPECIFIC SETTINGS							   					   #
+# **************************************************************************** #
 
-ENV_SRCS	= env/env_manager.c \
-			  env/expansion.c
+ifeq ($(shell uname -s), Linux)
+	CFLAGS += -D LINUX -Wno-unused-result
+endif
 
-IO_SRCS		= io/redirections.c
+# **************************************************************************** #
+#   RULES                                                                      #
+# **************************************************************************** #
 
-SIGNAL_SRCS	= signal/signals.c
+.PHONY: all clean fclean re test
 
-# Combine all sources
-SRCS		= $(MAIN_SRCS) \
-			  $(LEXER_SRCS) \
-			  $(PARSER_SRCS) \
-			  $(EXEC_SRCS) \
-			  $(BUILTIN_SRCS) \
-			  $(ENV_SRCS) \
-			  $(IO_SRCS) \
-			  $(SIGNAL_SRCS)
+$(NAME): libft/libft.a $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) -o $@ $(LDLIBS)
 
-# Object files
-OBJS		= $(SRCS:%.c=$(OBJ_DIR)/%.o)
+$(ODIR)/%.o: %.c $(DDIR)/%.d | $(ODIR) $(DDIR)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEPFLAGS) -c $< -o $@
 
-# Colors for output
-GREEN		= \033[0;32m
-YELLOW		= \033[0;33m
-RED			= \033[0;31m
-NC			= \033[0m
+$(ODIR):
+	mkdir -p $@
 
-# Main rule
-all: libft $(NAME)
+$(DDIR):
+	mkdir -p $@
 
-# Build libft
-libft:
-	@echo "$(YELLOW)Building libft...$(NC)"
-	@$(MAKE) -C $(LIBFT_DIR) --no-print-directory
+%.a:
+	$(MAKE) -C $(dir $@)
 
-# Build minishell
-$(NAME): $(OBJS)
-	@echo "$(YELLOW)Linking $(NAME)...$(NC)"
-	@$(CC) $(CFLAGS) $(OBJS) $(LIBS) -o $(NAME)
-	@echo "$(GREEN)✓ $(NAME) ready!$(NC)"
+all: $(NAME)
 
-# Compile object files
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	@mkdir -p $(dir $@)
-	@echo "$(YELLOW)Compiling $<...$(NC)"
-	@$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
-# Clean object files
 clean:
-	@echo "$(RED)Cleaning objects...$(NC)"
-	@$(MAKE) -C $(LIBFT_DIR) clean --no-print-directory
-	@rm -rf $(OBJ_DIR)
+	$(MAKE) -C libft fclean
+	$(RM) -r $(DDIR) $(ODIR)
 
-# Full clean
 fclean: clean
-	@echo "$(RED)Removing $(NAME)...$(NC)"
-	@$(MAKE) -C $(LIBFT_DIR) fclean --no-print-directory
-	@rm -f $(NAME)
+	$(RM) $(NAME)
 
-# Rebuild
 re: fclean all
 
-# Norminette check
-norm:
-	@echo "$(YELLOW)Checking norminette...$(NC)"
-	@norminette $(SRC_DIR) $(INC_DIR) | grep -E "(Error|Warning)" || echo "$(GREEN)✓ Norm OK$(NC)"
+test:
+	@cd tests && bash tester.sh a
 
-# Run with valgrind
-valgrind: $(NAME)
-	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./$(NAME)
-
-# Debug with lldb
-debug: $(NAME)
-	lldb ./$(NAME)
-
-.PHONY: all clean fclean re libft norm valgrind debug
+$(DEPS):
+include $(wildcard $(DEPS))

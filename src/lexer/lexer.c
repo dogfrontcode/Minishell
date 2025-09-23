@@ -3,65 +3,95 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: minishell <minishell@student.42.fr>          +#+  +:+       +#+        */
+/*   By: tjensen <tjensen@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/01 00:00:00 by minishell         #+#    #+#             */
-/*   Updated: 2024/01/01 00:00:00 by minishell        ###   ########.fr       */
+/*   Created: 2022/01/17 15:42:47 by hepple            #+#    #+#             */
+/*   Updated: 2022/01/17 16:10:40 by tjensen          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "lexer.h"
+#include "env.h"
+#include "exec.h"
+#include "printer.h"
 
-/* Phase 2: Lexer - Character scanner
- * TODO: Implement character-by-character scanning
- * - Ignore spaces/tabs
- * - Detect simple and double operators
- * - Manage quote states
- */
+static t_list	*token_list_get(char *input);
+static int		redir_mark_files(t_list *l_token);
 
-t_lexer	*init_lexer(char *input)
+t_list	*lexer(char *input)
 {
-	t_lexer	*lexer;
+	t_list		*l_token;
 
-	lexer = malloc(sizeof(t_lexer));
-	if (!lexer)
+	l_token = token_list_get(input);
+	if (l_token == NULL)
 		return (NULL);
-	lexer->input = input;
-	lexer->pos = 0;
-	lexer->len = ft_strlen(input);
-	lexer->state = STATE_NORMAL;
-	lexer->tokens = NULL;
-	return (lexer);
+	if (lexer_syntax_check(l_token) == ERROR)
+	{
+		exec_exit_status_set(ERR_SYNTAX_EXIT);
+		ft_lstclear(&l_token, c_token_destroy);
+		return (NULL);
+	}
+	if (redir_mark_files(l_token) == ERROR)
+	{
+		exec_exit_status_set(ERR_SYNTAX_EXIT);
+		ft_lstclear(&l_token, c_token_destroy);
+		return (NULL);
+	}
+	if (env_var_is_value(DEBUG_ENV, "printer"))
+		printer_token(l_token);
+	return (l_token);
 }
 
-t_token	*lexer_scan(t_lexer *lexer)
+static t_list	*token_list_get(char *input)
 {
-	// TODO: Implement actual lexical analysis
-	// For now, return a simple token for testing
-	t_token	*token;
+	t_list	*l_token;
+	int		i;
 
-	token = create_token(TOKEN_WORD, ft_strdup(lexer->input));
-	return (token);
+	l_token = NULL;
+	i = 0;
+	while (input && input[i])
+	{
+		if (lexer_token_bin_op(input, &i, &l_token) == ERROR)
+			break ;
+		if (lexer_token_pipe(input, &i, &l_token) == ERROR)
+			break ;
+		if (lexer_token_bracket(input, &i, &l_token) == ERROR)
+			break ;
+		if (lexer_token_redir(input, &i, &l_token) == ERROR)
+			break ;
+		if (lexer_token_text(input, &i, &l_token) == ERROR)
+			break ;
+		if (lexer_token_quote(input, &i, &l_token) == ERROR)
+			break ;
+		while (input[i] && ft_strchr(WHITESPACES, input[i]))
+			i++;
+	}
+	if (input[i] != '\0')
+		ft_lstclear(&l_token, c_token_destroy);
+	return (l_token);
 }
 
-void	free_lexer(t_lexer *lexer)
+static int	redir_mark_files(t_list *l_token)
 {
-	if (lexer)
-		free(lexer);
+	while (l_token)
+	{
+		if (token_content(l_token)->flags & TOK_REDIR)
+		{
+			if (l_token->next == NULL
+				|| !(token_content(l_token->next)->flags & TOK_TEXT))
+			{
+				print_error(SHELL_NAME, ERR_SYNTAX, NULL, ERR_REDIR);
+				return (ERROR);
+			}
+			l_token = l_token->next;
+			token_content(l_token)->flags |= TOK_REDIR_FILE;
+			while (token_content(l_token)->flags & TOK_CONNECTED)
+			{
+				token_content(l_token->next)->flags |= TOK_REDIR_FILE;
+				l_token = l_token->next;
+			}
+		}
+		l_token = l_token->next;
+	}
+	return (0);
 }
-
-int	is_operator(char c)
-{
-	return (c == '|' || c == '<' || c == '>');
-}
-
-int	is_whitespace(char c)
-{
-	return (c == ' ' || c == '\t' || c == '\n');
-}
-
-int	is_quote(char c)
-{
-	return (c == '\'' || c == '"');
-}
-

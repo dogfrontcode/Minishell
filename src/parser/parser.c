@@ -3,88 +3,63 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: minishell <minishell@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hepple <hepple@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/01 00:00:00 by minishell         #+#    #+#             */
-/*   Updated: 2024/01/01 00:00:00 by minishell        ###   ########.fr       */
+/*   Created: 2022/01/17 15:46:05 by hepple            #+#    #+#             */
+/*   Updated: 2022/01/17 15:46:09 by hepple           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "parser.h"
+#include "env.h"
+#include "printer.h"
 
-/* Phase 5: Parser - AST Construction
- * TODO: Build Abstract Syntax Tree
- * - Group WORDs into argv[]
- * - Associate redirections
- * - Build pipelines
- * - Validate syntax
- */
+static int	parser_recursive_merge(t_list **l_cmd);
 
-t_ast_node	*parse_tokens(t_token *tokens)
+t_list	*parser(t_list *l_token)
 {
-	// TODO: Implement actual parsing
-	// For now, return NULL
-	(void)tokens;
-	return (NULL);
-}
+	t_list	*l_cmd;
 
-t_command	*parse_command(t_token **tokens)
-{
-	// TODO: Parse single command with its arguments
-	(void)tokens;
-	return (NULL);
-}
-
-t_redirect	*parse_redirections(t_token **tokens)
-{
-	// TODO: Parse redirections from tokens
-	(void)tokens;
-	return (NULL);
-}
-
-void	free_ast(t_ast_node *node)
-{
-	if (!node)
-		return ;
-	free_ast(node->left);
-	free_ast(node->right);
-	if (node->command)
-		free_command(node->command);
-	free(node);
-}
-
-void	free_command(t_command *cmd)
-{
-	t_redirect	*redir;
-	t_redirect	*tmp;
-	int			i;
-
-	if (!cmd)
-		return ;
-	if (cmd->argv)
+	l_cmd = parser_scmd_tokens(l_token);
+	if (l_cmd == NULL)
+		return (NULL);
+	if (env_var_is_value(DEBUG_ENV, "printer"))
 	{
-		i = 0;
-		while (cmd->argv[i])
-			free(cmd->argv[i++]);
-		free(cmd->argv);
+		printer_cmd(l_cmd);
+		printer_structure(l_cmd);
 	}
-	redir = cmd->redirects;
-	while (redir)
+	if (parser_recursive_merge(&l_cmd) == ERROR)
 	{
-		tmp = redir;
-		redir = redir->next;
-		if (tmp->file)
-			free(tmp->file);
-		free(tmp);
+		ft_lstclear(&l_cmd, c_cmd_destroy);
+		return (NULL);
 	}
-	free(cmd);
+	if (env_var_is_value(DEBUG_ENV, "printer"))
+	{
+		printer_cmd(l_cmd);
+		write(1, "\n", 1);
+	}
+	return (l_cmd);
 }
 
-int	validate_syntax(t_token *tokens)
+static int	parser_recursive_merge(t_list **l_cmd)
 {
-	// TODO: Implement syntax validation
-	// For now, return 1 (valid)
-	(void)tokens;
-	return (1);
-}
+	int	group;
+	int	pipeline;
 
+	group = 1;
+	pipeline = 1;
+	while (group > 0 || pipeline > 0)
+	{
+		group = parser_cmd_group_merge(l_cmd);
+		if (group == ERROR)
+			return (ERROR);
+		if (group > 0 && env_var_is_value(DEBUG_ENV, "printer"))
+			printer_structure(*l_cmd);
+		pipeline = parser_cmd_pipeline_merge(l_cmd);
+		if (pipeline == ERROR)
+			return (ERROR);
+		if (pipeline > 0 && env_var_is_value(DEBUG_ENV, "printer"))
+			printer_structure(*l_cmd);
+	}
+	return (0);
+}
