@@ -3,46 +3,29 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strjoin.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mcombeau <mcombeau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mide-lim <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/26 18:18:15 by mcombeau          #+#    #+#             */
-/*   Updated: 2021/12/06 15:09:40 by mcombeau         ###   ########.fr       */
+/*   Created: 2024/10/19 00:03:26 by mide-lim          #+#    #+#             */
+/*   Updated: 2024/10/21 14:45:50 by mide-lim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-/*
-	DESCRIPTION :
-	The function ft_strjoin concatenates the given strings s1 and s2
-	and allocates sufficient memory for the newly created string.
-
-	RETURN VALUE :
-	A pointer to the new concatenated string.
-	NULL if the memory allocation fails.
-*/
-
 char	*ft_strjoin(char const *s1, char const *s2)
 {
-	char	*s;
-	size_t	len;
-	int		i;
+	char	*ptr;
+	int		l1;
+	int		l2;
 
-	len = ft_strlen(s1) + ft_strlen(s2);
-	s = ft_calloc(len + 1, sizeof(char));
-	if (!s)
+	if (!s1 || !s2)
 		return (NULL);
-	len = 0;
-	while (s1[len])
-	{
-		s[len] = s1[len];
-		len++;
-	}
-	i = 0;
-	while (s2[i])
-	{
-		s[len + i] = s2[i];
-		i++;
-	}
-	return (s);
+	l1 = ft_strlen(s1);
+	l2 = ft_strlen(s2);
+	ptr = (char *)ft_calloc(l1 + l2 + 1, 1);
+	if (!ptr)
+		return (NULL);
+	ft_memcpy(ptr, s1, l1);
+	ft_memcpy(ptr + l1, s2, l2);
+	return (ptr);
 }

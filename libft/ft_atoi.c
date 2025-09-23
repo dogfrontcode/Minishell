@@ -3,47 +3,36 @@
 /*                                                        :::      ::::::::   */
 /*   ft_atoi.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mcombeau <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: mide-lim <mide-lim@student.42.rio>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/24 18:06:58 by mcombeau          #+#    #+#             */
-/*   Updated: 2021/12/02 16:48:58 by mcombeau         ###   ########.fr       */
+/*   Created: 2024/10/10 10:49:32 by mide-lim          #+#    #+#             */
+/*   Updated: 2024/10/21 14:45:17 by mide-lim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-/*
-	DESCRIPTION :
-	The function ft_atoi converts a string into an int.
-
-	RETURN VALUE :
-	The converted int.
-*/
-
-int	ft_atoi(const char *str)
+int	ft_atoi(const char *nptr)
 {
-	int	num;
-	int	isneg;
-	int	i;
+	int		result;
+	int		sign;
+	size_t	i;
 
-	num = 0;
-	isneg = 1;
 	i = 0;
-	while (str[i] && (str[i] == ' ' || str[i] == '\t'
-			|| str[i] == '\n' || str[i] == '\r'
-			|| str[i] == '\v' || str[i] == '\f'))
+	sign = 1;
+	result = 0;
+	while (nptr[i] == ' ' || (nptr[i] >= 9 && nptr[i] <= 13))
 		i++;
-	if (str[i] == '+')
-		i++;
-	else if (str[i] == '-')
+	if (nptr[i] == '-' || nptr[i] == '+')
 	{
-		isneg *= -1;
+		if (nptr[i] == '-')
+			sign = sign * -1;
 		i++;
 	}
-	while (ft_isdigit(str[i]))
+	while (nptr[i] >= '0' && nptr[i] <= '9')
 	{
-		num = (num * 10) + (str[i] - '0');
+		result = 10 * result + (nptr[i] - '0');
 		i++;
 	}
-	return (num * isneg);
+	return (result * sign);
 }

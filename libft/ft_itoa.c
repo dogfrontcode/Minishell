@@ -3,76 +3,54 @@
 /*                                                        :::      ::::::::   */
 /*   ft_itoa.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mcombeau <mcombeau@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mide-lim <mide-lim@student.42.rio>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/11/27 18:04:16 by mcombeau          #+#    #+#             */
-/*   Updated: 2021/12/08 12:12:23 by mcombeau         ###   ########.fr       */
+/*   Created: 2024/10/20 21:21:52 by mide-lim          #+#    #+#             */
+/*   Updated: 2024/10/21 14:43:53 by mide-lim         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-/*
-	DESCRIPTION :
-	The function ft_itoa converts the integer n into a string of characters.
-
-	RESULT VALUE :
-	The string of the converted integer.
-*/
-
-static size_t	ft_itoa_len(long num)
+static size_t	ft_nbr_len(long int nbr)
 {
 	size_t	len;
 
 	len = 0;
-	if (num == 0)
-		return (1);
-	if (num < 0)
-	{
+	if (nbr <= 0)
 		len++;
-		num = -num;
-	}
-	while (num >= 1)
+	while (nbr)
 	{
+		nbr /= 10;
 		len++;
-		num /= 10;
 	}
 	return (len);
 }
 
-static char	*ft_num_to_str(long num, char *str, size_t len)
+char	*ft_itoa(int nbr)
 {
-	str = ft_calloc(len + 1, sizeof(char));
-	if (str == NULL)
-		return (NULL);
-	if (num < 0)
-	{
-		str[0] = '-';
-		num = -num;
-	}
-	len--;
-	while (len)
-	{
-		str[len] = (num % 10) + '0';
-		num /= 10;
-		len--;
-	}
-	if (str[0] != '-')
-		str[0] = (num % 10) + '0';
-	return (str);
-}
+	long int	nbr_;
+	size_t		len;
+	size_t		i;
+	char		*s;
 
-char	*ft_itoa(int n)
-{
-	long	num;
-	size_t	len;
-	char	*str;
-
-	num = n;
-	len = ft_itoa_len(num);
-	str = 0;
-	str = ft_num_to_str(num, str, len);
-	if (!str)
+	nbr_ = nbr;
+	len = ft_nbr_len(nbr);
+	i = len - 1;
+	s = (char *)ft_calloc((len + 1), sizeof(char));
+	if (!s)
 		return (NULL);
-	return (str);
+	if (nbr_ < 0)
+	{
+		s[0] = '-';
+		nbr_ *= -1;
+	}
+	if (nbr_ == 0)
+		s[0] = '0';
+	while (nbr_)
+	{
+		s[i--] = (nbr_ % 10) + 48;
+		nbr_ /= 10;
+	}
+	return (s);
 }
