@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   parser_scmd.c                                      :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hepple <hepple@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:45:46 by hepple            #+#    #+#             */
-/*   Updated: 2022/01/17 15:45:59 by hepple           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "parser.h"
 #include "redir.h"
@@ -24,7 +13,7 @@ t_list	*parser_scmd_tokens(t_list *l_token)
 	l_scmd = NULL;
 	while (l_token != NULL)
 	{
-		scmd = scmd_create(cmd_type_from_token(l_token));
+		scmd = create_simple_cmd(cmd_type_from_token(l_token));
 		if (scmd == NULL
 			|| (scmd_content(scmd)->type == CMD_SCMD
 				&& scmd_token_set(scmd_content(scmd), &l_token) == ERROR))

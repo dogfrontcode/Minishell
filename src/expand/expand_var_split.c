@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   expand_var_split.c                                 :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tjensen <tjensen@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:37:06 by hepple            #+#    #+#             */
-/*   Updated: 2022/01/17 15:59:26 by tjensen          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "expand.h"
 #include "lexer.h"
@@ -59,7 +48,7 @@ static int	var_get_splitted(t_list **l_splitted, t_list *token)
 	i = 0;
 	while (split[i])
 	{
-		new_token = token_create(split[i],
+		new_token = create_token(split[i],
 				token_content(token)->flags & ~TOK_CONNECTED);
 		if (new_token == NULL)
 			ft_free_split(&split);

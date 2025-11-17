@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   parser_group.c                                     :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hepple <hepple@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:43:40 by hepple            #+#    #+#             */
-/*   Updated: 2022/01/17 15:43:55 by hepple           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "parser.h"
 
@@ -32,7 +21,7 @@ int	parser_cmd_group_merge(t_list **l_cmd)
 	}
 	else
 	{
-		group = cmd_create(CMD_GROUP);
+		group = create_cmd_node(CMD_GROUP);
 		if (group == NULL)
 			return (ERROR);
 		cmd_content(group)->l_element = open->next;

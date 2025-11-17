@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   global.h                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tjensen <tjensen@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 16:01:31 by tjensen           #+#    #+#             */
-/*   Updated: 2022/01/17 16:01:32 by tjensen          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #ifndef GLOBAL_H
 # define GLOBAL_H
@@ -31,7 +20,7 @@
 
 # define ERROR		-1
 
-# define PROMPT 	"$> "
+# define PROMPT 	"monkeyshell$> "
 # define SHELL_NAME	"minishell"
 # define DEBUG_ENV	"DEBUG"
 

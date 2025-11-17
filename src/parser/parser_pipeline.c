@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   parser_pipeline.c                                  :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hepple <hepple@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:44:54 by hepple            #+#    #+#             */
-/*   Updated: 2022/01/17 15:44:55 by hepple           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "parser.h"
 
@@ -26,7 +15,7 @@ int	parser_cmd_pipeline_merge(t_list **l_cmd)
 	end = pipeline_end(start);
 	if (!start || !end)
 		return (0);
-	pipeline = cmd_create(CMD_PIPELINE);
+	pipeline = create_cmd_node(CMD_PIPELINE);
 	if (pipeline == NULL)
 		return (ERROR);
 	lst_relink(l_cmd, pipeline, start, end);

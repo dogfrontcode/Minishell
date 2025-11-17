@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   builtin_export.c                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hepple <hepple@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:13:40 by hepple            #+#    #+#             */
-/*   Updated: 2022/01/17 15:22:09 by hepple           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "builtin.h"
 #include "env.h"
@@ -61,7 +50,7 @@ static void	print_vars(void)
 	{
 		l_var_name = ft_strchr(env_copy[i], '=') - env_copy[i];
 		printf("%.*s", l_var_name + 1, env_copy[i]);
-		printf("\"%s\"\n", env_get_value(env_copy[i]));
+		printf("\"%s\"\n", get_env_value(env_copy[i]));
 		i++;
 	}
 	free(env_copy);

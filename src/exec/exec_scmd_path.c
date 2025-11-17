@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   exec_scmd_path.c                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tjensen <tjensen@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:31:58 by hepple            #+#    #+#             */
-/*   Updated: 2022/01/17 16:06:36 by tjensen          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include <sys/stat.h>
 
@@ -24,7 +13,7 @@ int	exec_scmd_search_path(char **argv)
 	char	**path_split;
 
 	path_split = NULL;
-	if (env_get_value("PATH") && argv[0][0] != '\0')
+	if (get_env_value("PATH") && argv[0][0] != '\0')
 	{
 		path_split = path_split_get();
 		if (path_split == NULL)
@@ -72,9 +61,9 @@ static char	**path_split_get(void)
 	char	**path_split;
 
 	path_split = NULL;
-	if (env_get_value("PATH"))
+	if (get_env_value("PATH"))
 	{
-		path_split = ft_split(env_get_value("PATH"), ':');
+		path_split = ft_split(get_env_value("PATH"), ':');
 		if (path_split == NULL)
 		{
 			print_error(SHELL_NAME, NULL, NULL, strerror(ENOMEM));

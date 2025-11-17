@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   lexer_token_text.c                                 :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tjensen <tjensen@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:41:54 by hepple            #+#    #+#             */
-/*   Updated: 2022/01/17 16:10:17 by tjensen          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "lexer.h"
 
@@ -28,7 +17,7 @@ int	lexer_token_text(char *str, int *i, t_list **l_token)
 		token_str = ft_substr(str, *i, len);
 		if (token_str == NULL)
 			return (print_error(SHELL_NAME, NULL, NULL, strerror(ENOMEM)));
-		token = token_create(token_str, TOK_TEXT);
+		token = create_token(token_str, TOK_TEXT);
 		if (token == NULL)
 			return (print_error(SHELL_NAME, NULL, NULL, strerror(ENOMEM)));
 		ft_lstadd_back(l_token, token);
@@ -54,9 +43,9 @@ int	lexer_token_quote(char *str, int *i, t_list **l_token)
 		if (token_str == NULL)
 			return (print_error(SHELL_NAME, NULL, NULL, strerror(ENOMEM)));
 		if (str[*i] == '\'')
-			token = token_create(token_str, TOK_TEXT | TOK_S_QUOTE);
+			token = create_token(token_str, TOK_TEXT | TOK_S_QUOTE);
 		else
-			token = token_create(token_str, TOK_TEXT | TOK_D_QUOTE);
+			token = create_token(token_str, TOK_TEXT | TOK_D_QUOTE);
 		if (token == NULL)
 			return (print_error(SHELL_NAME, NULL, NULL, strerror(ENOMEM)));
 		ft_lstadd_back(l_token, token);

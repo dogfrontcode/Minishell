@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   parser.c                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hepple <hepple@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:46:05 by hepple            #+#    #+#             */
-/*   Updated: 2022/01/17 15:46:09 by hepple           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "parser.h"
 #include "env.h"
@@ -16,7 +5,7 @@
 
 static int	parser_recursive_merge(t_list **l_cmd);
 
-t_list	*parser(t_list *l_token)
+t_list	*parse_tokens(t_list *l_token)
 {
 	t_list	*l_cmd;
 

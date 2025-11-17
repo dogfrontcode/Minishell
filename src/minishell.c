@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   minishell.c                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tjensen <tjensen@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:57:32 by hepple            #+#    #+#             */
-/*   Updated: 2022/01/30 09:52:00 by tjensen          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include <signal.h>
 #include <stdio.h>
@@ -32,7 +21,7 @@ int	main(void)
 	char	*input;
 
 	signal(SIGQUIT, SIG_IGN);
-	if (env_init() == ERROR)
+	if (init_environment() == ERROR)
 		return (EXIT_FAILURE);
 	while (1)
 	{
@@ -59,7 +48,7 @@ static char	*get_input(void)
 	char	*input;
 	char	*prompt;
 
-	prompt = env_get_value("PS1");
+	prompt = get_env_value("PS1");
 	if (prompt == NULL)
 		prompt = PROMPT;
 	if (isatty(STDIN_FILENO))
@@ -82,12 +71,12 @@ static void	process_input(char *input)
 	errno = 0;
 	l_token = NULL;
 	l_parser = NULL;
-	l_token = lexer(input);
+	l_token = tokenize(input);
 	free(input);
 	if (l_token != NULL)
-		l_parser = parser(l_token);
+		l_parser = parse_tokens(l_token);
 	if (l_token != NULL && l_parser != NULL)
-		exec_recursive(l_parser, false, l_parser);
+		execute_ast(l_parser, false, l_parser);
 	if (l_parser != NULL)
 		ft_lstclear(&l_parser, c_cmd_destroy);
 	else if (l_token != NULL)

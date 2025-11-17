@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   lexer_token_other.c                                :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hepple <hepple@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:41:22 by hepple            #+#    #+#             */
-/*   Updated: 2022/01/17 15:41:42 by hepple           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "lexer.h"
 
@@ -23,7 +12,7 @@ int	lexer_token_bin_op(char *str, int *i, t_list **l_token)
 		token_str = ft_substr(str, *i, 2);
 		if (token_str == NULL)
 			return (print_error(SHELL_NAME, NULL, NULL, strerror(ENOMEM)));
-		token = token_create(token_str, TOK_BIN_OP);
+		token = create_token(token_str, TOK_BIN_OP);
 		if (token == NULL)
 		{
 			free(token_str);
@@ -52,7 +41,7 @@ int	lexer_token_redir(char *str, int *i, t_list **l_token)
 		token_str = ft_substr(str, *i, len);
 		if (token_str == NULL)
 			return (print_error(SHELL_NAME, NULL, NULL, strerror(ENOMEM)));
-		token = token_create(token_str, TOK_REDIR);
+		token = create_token(token_str, TOK_REDIR);
 		if (token == NULL)
 		{
 			free(token_str);
@@ -74,7 +63,7 @@ int	lexer_token_pipe(char *str, int *i, t_list **l_token)
 		token_str = ft_substr(str, *i, 1);
 		if (token_str == NULL)
 			return (print_error(SHELL_NAME, NULL, NULL, strerror(ENOMEM)));
-		token = token_create(token_str, TOK_PIPE);
+		token = create_token(token_str, TOK_PIPE);
 		if (token == NULL)
 		{
 			free(token_str);
@@ -97,9 +86,9 @@ int	lexer_token_bracket(char *str, int *i, t_list **l_token)
 		if (token_str == NULL)
 			return (print_error(SHELL_NAME, NULL, NULL, strerror(ENOMEM)));
 		if (str[*i] == '(')
-			token = token_create(token_str, TOK_O_BRACKET);
+			token = create_token(token_str, TOK_O_BRACKET);
 		else
-			token = token_create(token_str, TOK_C_BRACKET);
+			token = create_token(token_str, TOK_C_BRACKET);
 		if (token == NULL)
 		{
 			free(token_str);

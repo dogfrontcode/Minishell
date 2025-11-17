@@ -1,18 +1,7 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   env.c                                              :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hepple <hepple@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:26:52 by hepple            #+#    #+#             */
-/*   Updated: 2022/01/17 15:27:05 by hepple           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "env.h"
 
-int	env_init(void)
+int	init_environment(void)
 {
 	extern char	**environ;
 	int			i;
@@ -38,7 +27,7 @@ int	env_init(void)
 	return (0);
 }
 
-char	*env_get_value(char *name)
+char	*get_env_value(char *name)
 {
 	char	*env_var;
 
@@ -74,7 +63,7 @@ bool	env_var_is_value(char *var_name, char *value)
 {
 	char	*env_value;
 
-	env_value = env_get_value(var_name);
+	env_value = get_env_value(var_name);
 	if (env_value)
 		if (ft_strncmp(env_value, value, ft_strlen(value) + 1) == 0)
 			return (true);

@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   exec.c                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tjensen <tjensen@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:36:04 by hepple            #+#    #+#             */
-/*   Updated: 2022/01/17 16:08:09 by tjensen          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include <stdio.h>
 #include <readline/readline.h>
@@ -18,12 +7,12 @@
 
 static bool	exec_operator_skip(t_list *l_cmd);
 
-int	exec_recursive(t_list *l_cmd, bool subshell, t_list *l_free)
+int	execute_ast(t_list *l_cmd, bool subshell, t_list *l_free)
 {
 	if (cmd_type(l_cmd) == CMD_SCMD)
-		exec_exit_status_set(exec_scmd(l_cmd, subshell, l_free));
+		exec_exit_status_set(execute_simple_cmd(l_cmd, subshell, l_free));
 	else if (cmd_type(l_cmd) == CMD_PIPELINE)
-		exec_exit_status_set(exec_pipeline(l_cmd, l_free));
+		exec_exit_status_set(execute_pipe_sequence(l_cmd, l_free));
 	else if (cmd_type(l_cmd) == CMD_GROUP)
 		exec_exit_status_set(exec_group(l_cmd, l_free));
 	if (l_cmd->next)
@@ -32,7 +21,7 @@ int	exec_recursive(t_list *l_cmd, bool subshell, t_list *l_free)
 		while (l_cmd && exec_operator_skip(l_cmd))
 			l_cmd = l_cmd->next->next;
 		if (l_cmd != NULL)
-			exec_exit_status_set(exec_recursive(l_cmd->next, subshell, l_free));
+			exec_exit_status_set(execute_ast(l_cmd->next, subshell, l_free));
 	}
 	return (exec_exit_status_get());
 }

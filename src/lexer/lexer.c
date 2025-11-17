@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   lexer.c                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tjensen <tjensen@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:42:47 by hepple            #+#    #+#             */
-/*   Updated: 2022/01/17 16:10:40 by tjensen          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "lexer.h"
 #include "env.h"
@@ -18,7 +7,7 @@
 static t_list	*token_list_get(char *input);
 static int		redir_mark_files(t_list *l_token);
 
-t_list	*lexer(char *input)
+t_list	*tokenize(char *input)
 {
 	t_list		*l_token;
 

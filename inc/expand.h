@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   expand.h                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tjensen <tjensen@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 16:01:34 by tjensen           #+#    #+#             */
-/*   Updated: 2022/01/17 16:01:35 by tjensen          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #ifndef EXPAND_H
 # define EXPAND_H
@@ -32,8 +21,8 @@
 /* ************************************************************************** */
 
 // EXPAND
-int		expand_var(t_c_scmd *c_scmd);
-int		expand_wildcard(t_c_scmd *c_scmd);
+int		expand_variables(t_c_scmd *c_scmd);
+int		expand_wildcards(t_c_scmd *c_scmd);
 
 // EXPAND_VAR_SPLIT
 int		expand_var_splitting(t_list **l_token);

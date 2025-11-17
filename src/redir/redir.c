@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   redir.c                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hepple <hepple@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:53:06 by hepple            #+#    #+#             */
-/*   Updated: 2022/01/17 15:53:30 by hepple           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include <fcntl.h>
 
@@ -18,7 +7,7 @@ static int	redir_process(char *redir, char *file, t_list **l_undo);
 static int	redir_fd(char *redir, int type);
 static int	redir_open_file(char *file, int type);
 
-int	redir(t_list *l_token, t_list **l_undo)
+int	apply_redirections(t_list *l_token, t_list **l_undo)
 {
 	t_list	*iter;
 	char	*tmp;

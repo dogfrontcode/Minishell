@@ -1,0 +1,4 @@
+linha 1 foo
+linha 2 bar
+linha 3 foo bar
+outra coisa

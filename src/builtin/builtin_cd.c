@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   builtin_cd.c                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hepple <hepple@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:12:31 by hepple            #+#    #+#             */
-/*   Updated: 2022/01/17 15:12:33 by hepple           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "builtin.h"
 #include "env.h"
@@ -42,13 +31,13 @@ static char	*get_dir(int argc, char **argv)
 	dir = NULL;
 	if (argc == 1)
 	{
-		dir = env_get_value("HOME");
+		dir = get_env_value("HOME");
 		if (dir == NULL)
 			print_error(SHELL_NAME, "cd", NULL, "HOME not set");
 	}
 	else if (argv[1] && ft_strncmp(argv[1], "-", 2) == 0)
 	{
-		dir = env_get_value("OLDPWD");
+		dir = get_env_value("OLDPWD");
 		if (dir == NULL)
 			print_error(SHELL_NAME, "cd", NULL, "OLDPWD not set");
 	}
@@ -61,9 +50,9 @@ static int	update_pwd(void)
 {
 	char	buf[PATH_MAX];
 
-	if (env_get_value("PWD"))
+	if (get_env_value("PWD"))
 	{
-		if (env_set_env("OLDPWD", env_get_value("PWD")) == ERROR)
+		if (env_set_env("OLDPWD", get_env_value("PWD")) == ERROR)
 			return (ERROR);
 	}
 	else

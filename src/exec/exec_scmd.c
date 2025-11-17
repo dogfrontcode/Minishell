@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   exec_scmd.c                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hepple <hepple@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:33:32 by hepple            #+#    #+#             */
-/*   Updated: 2022/01/17 18:30:30 by hepple           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include <signal.h>
 
@@ -22,7 +11,7 @@
 static int	exec_builtin(t_list *scmd, char **argv,
 				bool subshell, t_list *l_free);
 
-int	exec_scmd(t_list *scmd, bool subshell, t_list *l_free)
+int	execute_simple_cmd(t_list *scmd, bool subshell, t_list *l_free)
 {
 	char	**argv;
 	int		pid;
@@ -32,7 +21,7 @@ int	exec_scmd(t_list *scmd, bool subshell, t_list *l_free)
 		return (ERROR);
 	if (!(scmd_content(scmd)->l_argv))
 		return (0);
-	if (builtin_check(argv))
+	if (is_builtin_command(argv))
 		return (exec_builtin(scmd, argv, subshell, l_free));
 	pid = fork();
 	if (pid == -1)
@@ -41,7 +30,7 @@ int	exec_scmd(t_list *scmd, bool subshell, t_list *l_free)
 		return (print_error_errno(SHELL_NAME, NULL, NULL));
 	if (pid == 0)
 	{
-		if (redir(scmd_content(scmd)->l_redir, NULL) == ERROR)
+		if (apply_redirections(scmd_content(scmd)->l_redir, NULL) == ERROR)
 			exec_scmd_free_exit(EXIT_FAILURE, argv, l_free);
 		status = exec_scmd_exec(argv);
 		exec_scmd_free_exit(status, argv, l_free);
@@ -58,9 +47,9 @@ int	exec_scmd_preperation(t_list *scmd, char ***argv)
 
 	status = 0;
 	*argv = NULL;
-	if (expand_var(scmd_content(scmd)) == ERROR)
+	if (expand_variables(scmd_content(scmd)) == ERROR)
 		return (ERROR);
-	if (expand_wildcard(scmd_content(scmd)) == ERROR)
+	if (expand_wildcards(scmd_content(scmd)) == ERROR)
 		return (ERROR);
 	if (scmd_content(scmd)->l_argv)
 	{
@@ -70,7 +59,7 @@ int	exec_scmd_preperation(t_list *scmd, char ***argv)
 	}
 	else if (scmd_content(scmd)->l_redir)
 	{
-		status = redir(scmd_content(scmd)->l_redir, &l_redir_undo);
+		status = apply_redirections(scmd_content(scmd)->l_redir, &l_redir_undo);
 		if (redir_undo(&l_redir_undo) == ERROR)
 			status = ERROR;
 	}
@@ -84,7 +73,7 @@ int	exec_scmd_exec(char **argv)
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
 	termios_change(true);
-	if (!ft_strchr(argv[0], '/') && env_get_value("PATH") != NULL)
+	if (!ft_strchr(argv[0], '/') && get_env_value("PATH") != NULL)
 	{
 		if (exec_scmd_search_path(argv) == ERROR)
 		{
@@ -113,11 +102,11 @@ static int	exec_builtin(t_list *scmd, char **argv,
 	t_list	*l_redir_undo;
 	int		status;
 
-	if (builtin_check(argv))
+	if (is_builtin_command(argv))
 	{
-		status = redir(scmd_content(scmd)->l_redir, &l_redir_undo);
+		status = apply_redirections(scmd_content(scmd)->l_redir, &l_redir_undo);
 		if (status != ERROR)
-			status = builtin_exec(argv, subshell, l_free);
+			status = execute_builtin(argv, subshell, l_free);
 		if (redir_undo(&l_redir_undo) == ERROR)
 			status = ERROR;
 		ft_free_split(&argv);

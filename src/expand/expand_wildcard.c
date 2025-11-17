@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   expand_wildcard.c                                  :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tjensen <tjensen@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:39:18 by hepple            #+#    #+#             */
-/*   Updated: 2022/01/17 16:14:44 by tjensen          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "expand.h"
 
@@ -89,7 +78,7 @@ static t_list	*expand_pattern_to_list(char *pattern, char **split,
 		if (pattern_match_file(pattern, split, files[i]))
 		{
 			tmp = ft_strdup(files[i]);
-			new_token = token_create(tmp, TOK_WILDCARD);
+			new_token = create_token(tmp, TOK_WILDCARD);
 			if (tmp == NULL || new_token == NULL)
 			{
 				ft_lstdelone(new_token, c_token_destroy);

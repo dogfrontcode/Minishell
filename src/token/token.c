@@ -1,18 +1,7 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   token.c                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hepple <hepple@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:55:38 by hepple            #+#    #+#             */
-/*   Updated: 2022/01/17 15:55:47 by hepple           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "token.h"
 
-t_list	*token_create(char *string, int type)
+t_list	*create_token(char *string, int type)
 {
 	t_c_token	*c_token;
 	t_list		*token;

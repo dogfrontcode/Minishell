@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   builtin.c                                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hepple <hepple@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:14:12 by hepple            #+#    #+#             */
-/*   Updated: 2022/01/17 15:22:28 by hepple           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "builtin.h"
 
@@ -22,7 +11,7 @@ static const struct s_builtins	g_builtins[] = {
 	{NULL, NULL},
 };
 
-int	builtin_check(char **argv)
+int	is_builtin_command(char **argv)
 {
 	int	c_name;
 	int	i;
@@ -40,11 +29,11 @@ int	builtin_check(char **argv)
 	return (0);
 }
 
-int	builtin_exec(char **argv, bool subshell, t_list *l_free)
+int	execute_builtin(char **argv, bool subshell, t_list *l_free)
 {
 	int	i_builtin;
 
-	i_builtin = builtin_check(argv);
+	i_builtin = is_builtin_command(argv);
 	if (i_builtin == 0)
 		return (ERROR);
 	errno = 0;

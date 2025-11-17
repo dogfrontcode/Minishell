@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   exec_pipeline.c                                    :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tjensen <tjensen@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:31:07 by hepple            #+#    #+#             */
-/*   Updated: 2022/02/04 15:44:05 by tjensen          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "exec.h"
 #include "builtin.h"
@@ -20,7 +9,7 @@ static void	pipeline_element(t_list *element, int pipes[2][2],
 				int i, t_list *l_free);
 static void	pipeline_scmd(t_list *scmd, t_list *l_free);
 
-int	exec_pipeline(t_list *pipeline, t_list *l_free)
+int	execute_pipe_sequence(t_list *pipeline, t_list *l_free)
 {
 	t_list	*iter;
 	int		pipes[2][2];
@@ -81,7 +70,7 @@ static void	pipeline_element(t_list *element, int pipes[2][2],
 		pipeline_scmd(element, l_free);
 	else if (cmd_type(element) == CMD_GROUP)
 	{
-		status = exec_recursive(cmd_content(element)->l_element, true, l_free);
+		status = execute_ast(cmd_content(element)->l_element, true, l_free);
 		exec_free_all(NULL, l_free);
 		exit (status);
 	}
@@ -94,12 +83,12 @@ static void	pipeline_scmd(t_list *scmd, t_list *l_free)
 
 	if (exec_scmd_preperation(scmd, &argv) == ERROR)
 		exec_scmd_free_exit(EXIT_FAILURE, argv, l_free);
-	if (redir(scmd_content(scmd)->l_redir, NULL) == ERROR)
+	if (apply_redirections(scmd_content(scmd)->l_redir, NULL) == ERROR)
 		exec_scmd_free_exit(EXIT_FAILURE, argv, l_free);
 	if (!(scmd_content(scmd)->l_argv))
 		exec_scmd_free_exit(EXIT_SUCCESS, argv, l_free);
-	if (builtin_check(argv))
-		status = builtin_exec(argv, true, l_free);
+	if (is_builtin_command(argv))
+		status = execute_builtin(argv, true, l_free);
 	else
 		status = exec_scmd_exec(argv);
 	exec_scmd_free_exit(status, argv, l_free);

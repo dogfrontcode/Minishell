@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   token.h                                            :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tjensen <tjensen@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 16:01:23 by tjensen           #+#    #+#             */
-/*   Updated: 2022/01/17 16:01:24 by tjensen          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #ifndef TOKEN_H
 # define TOKEN_H
@@ -51,7 +40,7 @@ typedef struct s_token_content
 /* ************************************************************************** */
 
 // TOKEN
-t_list		*token_create(char *string, int type);
+t_list		*create_token(char *string, int type);
 t_c_token	*token_content(t_list *token);
 void		c_token_destroy(void *c_token);
 bool		token_is_cmd(t_list *token);

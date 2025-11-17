@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   exec.h                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tjensen <tjensen@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 16:01:36 by tjensen           #+#    #+#             */
-/*   Updated: 2022/01/30 09:35:12 by tjensen          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #ifndef EXEC_H
 # define EXEC_H
@@ -33,7 +22,7 @@
 /* ************************************************************************** */
 
 // EXEC
-int		exec_recursive(t_list *l_cmd, bool subshell, t_list *l_free);
+int		execute_ast(t_list *l_cmd, bool subshell, t_list *l_free);
 void	exec_free_all(char **argv, t_list *l_free);
 
 // EXEC_EXIT_STATUS
@@ -49,13 +38,13 @@ void	exec_pipeline_pipes_set(int fd[2], int pipes[2][2], int i, bool last);
 void	exec_pipeline_pipes_close(int pipes[2][2], int i, bool last);
 
 // EXEC_PIPELINE
-int		exec_pipeline(t_list *pipeline, t_list *l_free);
+int		execute_pipe_sequence(t_list *pipeline, t_list *l_free);
 
 // EXEC_SCMD_PATH
 int		exec_scmd_search_path(char **argv);
 
 // EXEC_SCMD
-int		exec_scmd(t_list *scmd, bool subshell, t_list *l_free);
+int		execute_simple_cmd(t_list *scmd, bool subshell, t_list *l_free);
 int		exec_scmd_preperation(t_list *scmd, char ***argv);
 int		exec_scmd_exec(char **argv);
 void	exec_scmd_free_exit(int status, char **argv, t_list *l_free);

@@ -1,18 +1,7 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   expand.c                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hepple <hepple@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:40:30 by hepple            #+#    #+#             */
-/*   Updated: 2022/01/17 15:40:35 by hepple           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "expand.h"
 
-int	expand_var(t_c_scmd *c_scmd)
+int	expand_variables(t_c_scmd *c_scmd)
 {
 	int		status;
 
@@ -26,7 +15,7 @@ int	expand_var(t_c_scmd *c_scmd)
 	return (status);
 }
 
-int	expand_wildcard(t_c_scmd *c_scmd)
+int	expand_wildcards(t_c_scmd *c_scmd)
 {
 	char	**files;
 	int		status;

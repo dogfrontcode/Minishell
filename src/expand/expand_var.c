@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   expand_var.c                                       :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: tjensen <tjensen@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/17 15:37:46 by hepple            #+#    #+#             */
-/*   Updated: 2022/01/17 16:21:43 by tjensen          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "expand.h"
 #include "env.h"
@@ -118,7 +107,7 @@ static int	expanded_str_append_var(char **exp_str, char *var)
 			return (print_error(SHELL_NAME, NULL, NULL, strerror(ENOMEM)));
 		i++;
 	}
-	var_value = env_get_value(var_name);
+	var_value = get_env_value(var_name);
 	free(var_name);
 	if (var_value == NULL)
 		var_value = "";
