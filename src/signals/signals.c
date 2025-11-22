@@ -24,9 +24,9 @@ void	signal_ctlc(int sig)
 	if (sig == SIGINT)
 	{
 		write(STDERR_FILENO, "\n", 1);
-		// rl_replace_line("", 0);  // Comentado: função pode não estar disponível no macOS
-		rl_line_buffer[0] = '\0';  // Alternativa: limpar o buffer diretamente
-		rl_point = rl_end = 0;     // Resetar posição do cursor
+		rl_line_buffer[0] = '\0';
+		rl_point = 0;
+		rl_end = 0;
 		rl_on_new_line();
 		rl_redisplay();
 	}

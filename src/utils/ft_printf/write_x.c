@@ -44,7 +44,7 @@ static int	write_x_helper(t_specs *specs, t_options *opts, char *base)
  * Function that writes a conversion specification of type x or X.
  */
 int	write_x(va_list args, t_options *opts, char *base)
-{	
+{
 	t_specs	*specs;
 	int		char_count;
 

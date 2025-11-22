@@ -38,7 +38,7 @@ static int	write_d_helper(t_specs *specs, t_options *opts)
  * Function that writes a conversion specification of type d or i.
  */
 int	write_d(va_list args, t_options *opts)
-{	
+{
 	t_specs	*specs;
 	int		char_count;
 

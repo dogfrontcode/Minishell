@@ -45,7 +45,7 @@ static unsigned int	get_zeros_d(t_specs *specs, t_options *opts)
 			if (specs->sign == '-' || opts->space == '1' || opts->plus == '1')
 				zeros--;
 		}
-	}	
+	}
 	return (zeros);
 }
 

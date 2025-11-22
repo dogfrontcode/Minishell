@@ -13,13 +13,13 @@
 #include "builtin.h"
 
 static const struct s_builtins	g_builtins[] = {
-	{"echo", builtin_echo},
-	{"cd", builtin_cd},
-	{"pwd", builtin_pwd},
-	{"env", builtin_env},
-	{"export", builtin_export},
-	{"unset", builtin_unset},
-	{NULL, NULL},
+{"echo", builtin_echo},
+{"cd", builtin_cd},
+{"pwd", builtin_pwd},
+{"env", builtin_env},
+{"export", builtin_export},
+{"unset", builtin_unset},
+{NULL, NULL},
 };
 
 int	is_builtin_command(char **argv)

@@ -83,7 +83,7 @@ static t_specs	*get_specs_u(va_list args, t_options *opts)
  * Function that writes a conversion specification of type u.
  */
 int	write_u(va_list args, t_options *opts)
-{	
+{
 	t_specs	*specs;
 	int		char_count;
 
