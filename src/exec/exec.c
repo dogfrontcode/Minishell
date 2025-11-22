@@ -1,9 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_group.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: tidos-sa <tidos-sa@student.42.fr>          +#+  +:+      +#+         */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/21 19:26:48 by tidos-sa          #+#    #+#             */
+/*   Updated: 2025/11/21 19:26:49 by tidos-sa         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#include <stdio.h>
-#include <readline/readline.h>
 
-#include "exec.h"
 #include "cmd.h"
+#include "exec.h"
+#include <readline/readline.h>
+#include <stdio.h>
 
 static bool	exec_operator_skip(t_list *l_cmd);
 
@@ -34,7 +45,7 @@ void	exec_free_all(char **argv, t_list *l_free)
 		ft_lstclear(&l_free, c_cmd_destroy);
 	if (g_env)
 		ft_free_split(&g_env);
-	clear_history();
+	rl_clear_history();
 }
 
 static bool	exec_operator_skip(t_list *l_cmd)

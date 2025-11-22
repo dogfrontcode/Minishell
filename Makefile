@@ -3,17 +3,17 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: tjensen <tjensen@student.42.fr>            +#+  +:+       +#+         #
+#    By: tidos-sa <tidos-sa@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/27 22:03:08 by tjensen           #+#    #+#              #
-#    Updated: 2022/07/25 20:43:58 by tjensen          ###   ########.fr        #
+#    Updated: 2025/11/21 23:40:53 by tidos-sa         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME        := minishell
 
 CC          := gcc
-CFLAGS      := -Wall -Wextra -Werror -O2
+CFLAGS      := -g -Wall -Wextra -Werror -O2
 
 CPPFLAGS    := -I./inc -I./libft
 DEPFLAGS     = -MT $@ -MMD -MP -MF $(DDIR)/$*.d
