@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "lexer.h"
 
 int	lexer_token_bin_op(char *str, int *i, t_list **l_token)

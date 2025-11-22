@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "expand.h"
 
 static int		expand_wildcard_token(t_list *token, t_list **l_wildcard,

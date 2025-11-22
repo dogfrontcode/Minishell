@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "builtin.h"
 
 int	builtin_echo(int argc __attribute((unused)), char **argv)

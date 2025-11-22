@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "redir.h"
 
 static t_list			*redir_undo_create(int fd_repl, int fd_repl_dup);

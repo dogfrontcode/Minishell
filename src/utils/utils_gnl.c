@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 /*
  * NOTA: Esta é a implementação simplificada de get_next_line usada no minishell.
  * É diferente da GNL padrão da 42 - lê caractere por caractere.

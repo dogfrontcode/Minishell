@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "global.h"
 
 int	print_error(char *s1, char *s2, char *s3, char *message)

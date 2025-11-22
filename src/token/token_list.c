@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-
 #include "token.h"
 
 static int	l_token_count_strings(t_list *l_token);
